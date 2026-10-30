@@ -6,8 +6,9 @@ English-language prep site for the HSK and HSKK. A static site: no server, no ru
 
 | File | What it is |
 |---|---|
-| `index.html` | The whole site (levels, vocabulary, tones, HSKK mock tasks, recording practice) |
-| `vocab.json` | HSK 3.0 levels 1–6 word list: `[level][i] = [hanzi, pinyin, English]` |
+| `public/index.html` | The whole site (levels, vocabulary, tones, HSKK mock tasks, recording practice) |
+| `public/vocab.json` | HSK 3.0 levels 1–6 word list: `[level][i] = [hanzi, pinyin, English]` |
+| `wrangler.jsonc` | Cloudflare Workers config: serves the `public/` folder as a static site |
 | `functions/api/score.js` | Optional: paid detailed scoring through Azure. Not used unless you switch it on. |
 
 ## How Record & score works (free, unlimited)
@@ -24,10 +25,8 @@ Accuracy improves after a learner's first few recordings, because the page learn
 
 ## Deploy (free)
 
-1. Create a GitHub repository and upload these files.
-2. Cloudflare dashboard → Workers & Pages → Create → Pages → Connect to Git → pick the repository.
-   Build command: leave empty. Output directory: `/`.
-3. Deploy. Microphone access needs HTTPS, which Cloudflare Pages provides automatically.
+The repository is connected to a Cloudflare Worker named `hsk-studio`. Every push to `main` rebuilds and redeploys automatically
+(`npx wrangler deploy`, using `wrangler.jsonc`). Microphone access needs HTTPS, which Cloudflare Pages provides automatically.
 
 ## Optional: detailed AI scoring later
 
