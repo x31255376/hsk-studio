@@ -1,0 +1,638 @@
+<title>HSK &amp; HSKK Studio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:wght@400;500;600&family=Noto+Serif+SC:wght@500;700&display=swap">
+<style>
+/* Layout: study page — hero, sticky section tabs, then stations: levels → vocab → tones → HSKK speaking → pronunciation */
+:root{
+  --bg:#eef1f3; --surface:#ffffff; --ink:#1b2a3a; --muted:#5a6878; --line:#d3dae1;
+  --jade:#0f7a68; --jade-soft:#d9efe9; --cinnabar:#b83a2a;
+  --t1:#2f6fb5; --t2:#0f7a68; --t3:#b07a12; --t4:#b83a2a;
+  --display:"Young Serif",Georgia,serif;
+  --body:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
+  --han:"Noto Serif SC","Songti SC","SimSun",serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121a22; --surface:#1a2530; --ink:#e4eaf0; --muted:#97a6b5; --line:#2c3a48;
+  --jade:#4cc3a9; --jade-soft:#173a35; --cinnabar:#ec7a66;
+  --t1:#7fb2ec; --t2:#4cc3a9; --t3:#e3b04f; --t4:#ec7a66; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121a22; --surface:#1a2530; --ink:#e4eaf0; --muted:#97a6b5; --line:#2c3a48;
+  --jade:#4cc3a9; --jade-soft:#173a35; --cinnabar:#ec7a66;
+  --t1:#7fb2ec; --t2:#4cc3a9; --t3:#e3b04f; --t4:#ec7a66; color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0}
+h2{font-size:1.75rem} h3{font-size:1.15rem}
+p{margin:0;max-width:65ch}
+.han{font-family:var(--han)}
+.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
+
+.hero{padding-block:48px 32px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end}
+.hero h1{font-size:clamp(2.2rem,6vw,3.6rem);line-height:1.05}
+.hero p{margin-top:14px;color:var(--muted);font-size:1.05rem}
+.stamp{width:132px;height:132px;border:3px solid var(--cinnabar);color:var(--cinnabar);border-radius:10px;display:grid;place-items:center;transform:rotate(-6deg);font-family:var(--han);font-weight:700;font-size:1.9rem;line-height:1.1;text-align:center;padding:10px}
+.stamp small{display:block;font-family:var(--body);font-size:.62rem;letter-spacing:.14em;font-weight:600;margin-top:4px}
+@media (max-width:560px){.hero{grid-template-columns:1fr}.stamp{width:104px;height:104px;font-size:1.4rem}}
+
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:4px;overflow-x:auto;padding-block:8px;scrollbar-width:none}
+nav a{flex:none;color:var(--muted);text-decoration:none;padding:8px 12px;border-radius:999px;font-weight:500;font-size:.92rem}
+nav a:hover{color:var(--ink);background:var(--surface)}
+
+section{padding-block:44px;border-bottom:1px solid var(--line);display:grid;gap:20px;scroll-margin-top:60px}
+.lede{color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;min-width:0}
+.note{font-size:.88rem;color:var(--muted)}
+.warn{font-size:.85rem;color:var(--cinnabar)}
+
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+.seg button[aria-pressed="true"]{background:var(--jade);border-color:var(--jade);color:var(--surface)}
+
+.lvl{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:700px){.lvl{grid-template-columns:1fr}}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 16px;font-size:.95rem}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-variant-numeric:tabular-nums}
+.big{font-family:var(--display);font-size:2.6rem;line-height:1;color:var(--jade);font-variant-numeric:tabular-nums}
+.vbar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.vbar span{display:block;height:100%;background:var(--jade)}
+.table-scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);font-size:.92rem}
+th{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.chip{display:inline-block;font-size:.75rem;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--jade-soft);color:var(--jade)}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:4px;justify-items:start;text-align:left;color:var(--ink)}
+.card .ch{font-family:var(--han);font-size:1.7rem;line-height:1.25}
+.card .py{font-weight:600}
+.card .en{font-size:.85rem;color:var(--muted)}
+.card[data-hidden="1"] .py,.card[data-hidden="1"] .en{visibility:hidden}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:1px solid var(--jade);background:var(--jade);color:var(--surface);font-weight:600}
+.btn.ghost{background:transparent;color:var(--jade)}
+
+.tones{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:620px){.tones{grid-template-columns:repeat(2,1fr)}}
+.tone{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:6px;text-align:left;color:var(--ink)}
+.tone svg{width:100%;height:70px}
+.tone .ch{font-family:var(--han);font-size:1.6rem}
+.tone .lbl{font-size:.8rem;color:var(--muted)}
+.quiz{display:grid;gap:14px}
+.quiz-top{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.choices{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.choice{padding:14px 6px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-weight:600}
+.choice.right{background:var(--jade-soft);border-color:var(--jade);color:var(--jade)}
+.choice.wrong{border-color:var(--cinnabar);color:var(--cinnabar)}
+.score{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.9rem}
+.reveal{min-height:1.6em;font-size:.95rem}
+
+.tasks{display:grid;gap:12px}
+.task{display:grid;gap:12px}
+.task-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
+.task-meta{font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.prompt{font-family:var(--han);font-size:1.35rem;line-height:1.8}
+.prompt.masked{filter:blur(7px);user-select:none}
+.en-hint{font-size:.9rem;color:var(--muted)}
+.timer{font-family:var(--display);font-size:2.4rem;font-variant-numeric:tabular-nums;line-height:1}
+.timer.low{color:var(--cinnabar)}
+.phase{font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+.pairs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.pair{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
+.pair button{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;color:var(--ink);display:grid;gap:2px}
+.pair .ch{font-family:var(--han);font-size:1.5rem}
+.pair .vs{color:var(--muted);font-size:.8rem}
+.pair-head{font-size:.8rem;color:var(--muted);grid-column:1/-1}
+.rules{display:grid;gap:10px}
+.rule{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center}
+.rule .ex{font-family:var(--han);font-size:1.25rem}
+.rule .how{font-size:.9rem;color:var(--muted)}
+.play{width:40px;height:40px;border-radius:50%;border:1px solid var(--jade);background:transparent;color:var(--jade);display:grid;place-items:center}
+
+.search{flex:1 1 220px;min-width:0;font:inherit;padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.more{justify-self:center}
+
+/* practice sheet */
+.sheet{position:fixed;inset:auto 0 0 0;z-index:20;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -12px 32px rgba(10,20,30,.18);padding-bottom:env(safe-area-inset-bottom,0px);max-height:85vh;overflow-y:auto}
+.sheet-in{max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 22px;display:grid;gap:14px}
+.sheet-head{display:flex;justify-content:space-between;gap:12px;align-items:start}
+.target{font-family:var(--han);font-size:2.4rem;line-height:1.2;overflow-wrap:anywhere}
+.target.long{font-size:1.3rem;line-height:1.7}
+.close{width:40px;height:40px;flex:none;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:1.2rem}
+.btn.rec{background:var(--cinnabar);border-color:var(--cinnabar)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.status{font-size:.9rem;color:var(--muted);min-height:1.4em}
+.scores{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:480px){.scores{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.sc{border:1px solid var(--line);border-radius:10px;padding:10px;display:grid;gap:2px}
+.sc b{font-family:var(--display);font-weight:400;font-size:1.7rem;font-variant-numeric:tabular-nums;line-height:1}
+.sc span{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chars{display:flex;flex-wrap:wrap;gap:6px}
+.chars span{font-family:var(--han);font-size:1.4rem;padding:4px 8px;border-radius:8px;border:1px solid var(--line)}
+.chars .ok{background:var(--jade-soft);border-color:var(--jade);color:var(--jade)}
+.chars .mid{border-color:var(--t3);color:var(--t3)}
+.chars .bad{border-color:var(--cinnabar);color:var(--cinnabar)}
+
+footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+
+<header class="wrap hero">
+  <div>
+    <div class="eyebrow">Hanyu Shuiping Kaoshi · 汉语水平考试</div>
+    <h1>Prepare for the HSK and HSKK, explained in English.</h1>
+    <p>The HSK is the official Chinese proficiency test for non-native speakers, used for university admission, scholarships and work in China. The HSKK is its speaking test. Find your level, learn the words, and rehearse the speaking tasks out loud.</p>
+  </div>
+  <div class="stamp" aria-hidden="true">四级<small>HSK 4</small></div>
+</header>
+
+<nav aria-label="Sections"><div class="wrap">
+  <a href="#levels">Levels</a><a href="#vocab">Vocabulary</a><a href="#tones">Tones</a><a href="#hskk">HSKK speaking</a><a href="#pron">Pronunciation</a>
+</div></nav>
+
+<main class="wrap">
+  <section id="levels">
+    <div class="eyebrow">Find your level</div>
+    <h2>Six levels today, nine under HSK 3.0</h2>
+    <p class="lede">Pick a level to see what the exam asks of you. HSK 4 is the usual minimum for studying a degree in China.</p>
+    <div class="seg" id="lvlSeg" role="group" aria-label="HSK level"></div>
+    <div class="lvl">
+      <div class="panel" style="display:grid;gap:14px;align-content:start">
+        <div class="eyebrow" id="lvlTag"></div>
+        <div><span class="big" id="lvlWords"></span> <span class="note">words (current HSK)</span></div>
+        <div class="vbar" aria-hidden="true"><span id="lvlBar"></span></div>
+        <p id="lvlCan"></p>
+      </div>
+      <div class="panel">
+        <dl class="kv" id="lvlKv"></dl>
+      </div>
+    </div>
+    <div class="panel" style="display:grid;gap:10px">
+      <h3>What is changing with HSK 3.0</h3>
+      <p class="note">The new framework has nine bands: 1–3 beginner, 4–6 intermediate, 7–9 advanced. HSK 7–9 already runs as one combined exam with translation and speaking. For levels 1–6, the new format was trialled worldwide in January 2026, and candidates for levels 3–6 in that trial also had to register for a speaking test. Many centres still run the familiar format through 2026, so check your centre on chinesetest.cn before you book.</p>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Band</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7–9</th></tr></thead>
+        <tbody>
+          <tr><td>Current HSK words</td><td>150</td><td>300</td><td>600</td><td>1,200</td><td>2,500</td><td>5,000</td><td>—</td></tr>
+          <tr><td>HSK 3.0 words (cumulative)</td><td>500</td><td>1,272</td><td>2,245</td><td>3,245</td><td>4,316</td><td>5,456</td><td>11,092</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section id="vocab">
+    <div class="eyebrow">Vocabulary</div>
+    <h2>The full HSK 3.0 word list, levels 1–6</h2>
+    <p class="lede">Every word from the new syllabus, grouped by the level where it first appears. Say each word before you tap it; the tap reveals the pinyin, plays the model and opens pronunciation practice. Pinyin is colored by tone.</p>
+    <div class="seg" id="vocabSeg" role="group" aria-label="Vocabulary level"></div>
+    <div class="toolbar">
+      <input class="search" id="vSearch" type="search" aria-label="Search words" placeholder="Search 汉字, pinyin or English" autocomplete="off">
+      <button class="btn ghost" id="shuffle" type="button">Shuffle</button>
+      <button class="btn ghost" id="toggleAll" type="button">Show all answers</button>
+    </div>
+    <span class="note" id="vocabCount">Loading the word list…</span>
+    <div class="cards" id="cards"></div>
+    <button class="btn ghost more" id="more" type="button" hidden>Show more</button>
+  </section>
+
+  <section id="tones">
+    <div class="eyebrow">Foundation</div>
+    <h2>The four tones</h2>
+    <p class="lede">Tones decide your HSKK pronunciation score and how well you catch HSK listening questions. Tap a card to hear it.</p>
+    <div class="tones" id="toneCards"></div>
+    <div class="panel quiz">
+      <div class="quiz-top"><h3>Tone ear-training</h3><span class="score" id="quizScore">0 / 0</span></div>
+      <div class="toolbar"><button class="btn" id="quizPlay" type="button">▶ Play syllable</button><button class="btn ghost" id="quizNext" type="button">Next</button></div>
+      <div class="choices" id="quizChoices"></div>
+      <div class="reveal" id="quizReveal"></div>
+    </div>
+    <p class="warn" id="ttsWarn" hidden>Your browser has no Chinese voice installed, so audio may sound wrong or silent. On iPhone, add a Chinese voice in Settings › Accessibility › Spoken Content.</p>
+  </section>
+
+  <section id="hskk">
+    <div class="eyebrow">Speaking test</div>
+    <h2>HSKK mock tasks</h2>
+    <p class="lede">The HSKK is recorded: you hear or read a prompt and speak into a microphone. Each level is scored out of 100 and you pass with 60. Run each task below with the built-in timers, and record yourself on your phone to review.</p>
+    <div class="seg" id="kkSeg" role="group" aria-label="HSKK level"></div>
+    <p class="note" id="kkInfo"></p>
+    <div class="tasks" id="tasks"></div>
+  </section>
+
+  <section id="pron">
+    <div class="eyebrow">Pronunciation</div>
+    <h2>Sounds English speakers mix up</h2>
+    <div class="pairs" id="pairs"></div>
+    <h3>Tone changes you need to say, not just read</h3>
+    <div class="panel rules" id="rules"></div>
+  </section>
+</main>
+
+<footer class="wrap">Model audio uses your device's built-in Chinese voice. Tone checks run entirely on your device: your recording is analysed in the browser and never uploaded. Where your browser offers speech recognition, it also checks which characters were understood. Word list: HSK 3.0 syllabus via the open-source complete-hsk-vocabulary project (MIT), definitions from CC-CEDICT. Exam formats vary by test centre; confirm on chinesetest.cn. Practice sentences are original.</footer>
+
+<div class="sheet" id="practice" role="dialog" aria-label="Pronunciation practice" hidden>
+  <div class="sheet-in">
+    <div class="sheet-head">
+      <div style="min-width:0">
+        <div class="eyebrow">Pronunciation practice</div>
+        <div class="target" id="pTarget"></div>
+        <div id="pPinyin" class="py"></div>
+        <div id="pGloss" class="note"></div>
+      </div>
+      <button class="close" id="pClose" type="button" aria-label="Close practice">×</button>
+    </div>
+    <div class="toolbar">
+      <button class="btn ghost" id="pListen" type="button">▶ Listen</button>
+      <button class="btn rec" id="pRec" type="button">● Record</button>
+      <button class="btn ghost" id="pPlayback" type="button" disabled>Play my recording</button>
+    </div>
+    <div class="status" id="pStatus">Listen to the model, then record yourself saying it.</div>
+    <div id="pResult" hidden>
+      <div class="scores" id="pScores"></div>
+      <div class="chars" id="pChars" style="margin-top:10px"></div>
+      <p class="note" id="pNote" style="margin-top:8px"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const TONE_COLORS=['var(--t1)','var(--t2)','var(--t3)','var(--t4)'];
+let zhVoice=null;
+function loadVoices(){
+  if(!('speechSynthesis' in window)){$('#ttsWarn').hidden=false;return}
+  const v=speechSynthesis.getVoices();
+  zhVoice=v.find(x=>/zh[-_]CN/i.test(x.lang))||v.find(x=>/^zh/i.test(x.lang))||null;
+  if(v.length&&!zhVoice)$('#ttsWarn').hidden=false;
+}
+if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}else{$('#ttsWarn').hidden=false}
+function speak(text,rate=0.8,onend){
+  if(!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);u.lang='zh-CN';u.rate=rate;if(zhVoice)u.voice=zhVoice;
+  if(onend)u.onend=onend;speechSynthesis.speak(u);
+}
+function toneOf(py){const m={1:/[āēīōūǖ]/,2:/[áéíóúǘ]/,3:/[ǎěǐǒǔǚ]/,4:/[àèìòùǜ]/};for(const k in m)if(m[k].test(py))return +k;return 0}
+function colorPinyin(py){return py.split(' ').map(s=>{const t=toneOf(s);return `<span style="color:${t?TONE_COLORS[t-1]:'var(--muted)'}">${s}</span>`}).join(' ')}
+function seg(el,items,onPick,start){
+  el.innerHTML=items.map((t,i)=>`<button type="button" data-i="${i}" aria-pressed="${i===start}">${t}</button>`).join('');
+  el.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;el.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));onPick(+b.dataset.i)});
+}
+
+/* levels */
+const LEVELS=[
+ {words:150,can:'Understand and use very simple phrases: greetings, numbers, time, family.',secs:'Listening, reading',q:'40 questions · about 40 min',pass:'120 / 200',kk:'HSKK Beginner',band:'Band 1 (500 words)'},
+ {words:300,can:'Handle short, routine exchanges about daily life: shopping, directions, plans.',secs:'Listening, reading',q:'60 questions · about 55 min',pass:'120 / 200',kk:'HSKK Beginner',band:'Band 2 (1,272 words)'},
+ {words:600,can:'Get by in daily life, study and work; deal with most travel situations in China.',secs:'Listening, reading, writing',q:'80 questions · about 90 min',pass:'180 / 300',kk:'HSKK Intermediate',band:'Band 3 (2,245 words)'},
+ {words:1200,can:'Discuss a wide range of topics fluently with native speakers. Usual entry bar for degree study.',secs:'Listening, reading, writing',q:'100 questions · about 105 min',pass:'180 / 300',kk:'HSKK Intermediate',band:'Band 4 (3,245 words)'},
+ {words:2500,can:'Read newspapers and magazines, enjoy films and plays, and give a full speech in Chinese.',secs:'Listening, reading, writing',q:'100 questions · about 125 min',pass:'180 / 300',kk:'HSKK Advanced',band:'Band 5 (4,316 words)'},
+ {words:5000,can:'Understand spoken and written Chinese with ease and express yourself fluently in writing and speech.',secs:'Listening, reading, writing',q:'101 questions · about 140 min',pass:'180 / 300',kk:'HSKK Advanced',band:'Band 6 (5,456 words)'}];
+function showLevel(i){const L=LEVELS[i];
+  $('#lvlTag').textContent=`HSK ${i+1} · ${i<2?'beginner':i<4?'intermediate':'advanced'}`;
+  $('#lvlWords').textContent=L.words.toLocaleString();
+  $('#lvlBar').style.width=(L.words/5000*100)+'%';
+  $('#lvlCan').textContent=L.can;
+  $('#lvlKv').innerHTML=`<dt>Sections</dt><dd>${L.secs}</dd><dt>Length</dt><dd>${L.q}</dd><dt>Pass mark</dt><dd>${L.pass}</dd><dt>Speaking test</dt><dd><span class="chip">${L.kk}</span></dd><dt>HSK 3.0 equivalent</dt><dd>${L.band}</dd>`;}
+seg($('#lvlSeg'),[1,2,3,4,5,6].map(n=>'HSK '+n),showLevel,3);showLevel(3);
+
+/* vocabulary */
+/* vocabulary: full HSK 3.0 list, loaded from vocab.json */
+let VOCAB=null,vl=1,order=[],showAll=false,shown=0,query='';
+const PAGE=60;
+function escapeHtml(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function plain(py){return py.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/ü/g,'v').replace(/\s+/g,'').toLowerCase()}
+function currentList(){
+  // each entry: [hanzi, pinyin, gloss, level]
+  const lv=vl===0?[0,1,2,3,4,5]:[vl-1];
+  let list=[];lv.forEach(i=>VOCAB[i].forEach((w,k)=>list.push([w[0],w[1],w[2],i+1])));
+  if(query){const q=query.trim().toLowerCase(),qp=plain(q);
+    list=list.filter(w=>w[0].includes(q)||plain(w[1]).startsWith(qp)||plain(w[1]).includes(qp)&&qp.length>2||w[2].toLowerCase().includes(q))}
+  return list;
+}
+function rebuild(){if(!VOCAB)return;order=currentList();shown=0;$('#cards').innerHTML='';renderMore()}
+function cardHtml(w,idx){return `<button class="card" type="button" data-idx="${idx}" data-hidden="${showAll?0:1}"><span class="ch">${escapeHtml(w[0])}</span><span class="py">${colorPinyin(escapeHtml(w[1]))}</span><span class="en">${escapeHtml(w[2])}${vl===0?` · HSK ${w[3]}`:''}</span></button>`}
+function renderMore(){
+  const next=order.slice(shown,shown+PAGE);
+  $('#cards').insertAdjacentHTML('beforeend',next.map((w,i)=>cardHtml(w,shown+i)).join(''));
+  shown+=next.length;
+  const scope=vl===0?'HSK 1–6':`HSK ${vl}`;
+  $('#vocabCount').textContent=order.length?`${order.length.toLocaleString()} words in ${scope}${query?` matching “${query}”`:''} · showing ${shown.toLocaleString()}`:`No words in ${scope} match “${query}”.`;
+  $('#more').hidden=shown>=order.length;
+}
+$('#more').onclick=renderMore;
+$('#cards').addEventListener('click',e=>{const c=e.target.closest('.card');if(!c)return;c.dataset.hidden='0';const w=order[c.dataset.idx];speak(w[0],0.7);openPractice(w[0],w[1],w[2])});
+$('#shuffle').onclick=()=>{for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]]}shown=0;$('#cards').innerHTML='';renderMore()};
+$('#toggleAll').onclick=()=>{showAll=!showAll;$('#toggleAll').textContent=showAll?'Hide answers':'Show all answers';document.querySelectorAll('#cards .card').forEach(c=>c.dataset.hidden=showAll?'0':'1')};
+let st=null;$('#vSearch').addEventListener('input',e=>{clearTimeout(st);st=setTimeout(()=>{query=e.target.value;rebuild()},180)});
+seg($('#vocabSeg'),['All levels',1,2,3,4,5,6].map((n,i)=>i?'HSK '+n:n),i=>{vl=i;rebuild()},1);
+fetch('vocab.json').then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(d=>{VOCAB=d;rebuild()})
+  .catch(()=>{$('#vocabCount').textContent='The word list could not load. Check your connection and reload the page.'});
+
+/* on-device tone analysis: pitch tracking + tone classification, no server */
+const TONE_SR=16000;
+function trackPitch(pcm,sr=TONE_SR){
+  // returns frames [{t, f0|0, rms}] every 10 ms, using a normalized-autocorrelation (YIN-style) pitch estimate
+  const win=Math.round(sr*0.04),hop=Math.round(sr*0.01),minLag=Math.floor(sr/420),maxLag=Math.ceil(sr/65);
+  const frames=[];let peak=0;
+  for(let s=0;s+win+maxLag<pcm.length;s+=hop){let e=0;for(let i=0;i<win;i++)e+=pcm[s+i]*pcm[s+i];const rms=Math.sqrt(e/win);frames.push({t:s/sr,s,rms,f0:0});if(rms>peak)peak=rms}
+  const gate=Math.max(peak*0.12,0.004);
+  const d=new Float32Array(maxLag+1);
+  for(const fr of frames){
+    if(fr.rms<gate)continue;
+    // difference function and cumulative mean normalisation
+    d[0]=1;let run=0;
+    for(let lag=1;lag<=maxLag;lag++){let sum=0;for(let i=0;i<win;i++){const x=pcm[fr.s+i]-pcm[fr.s+i+lag];sum+=x*x}run+=sum;d[lag]=run?sum*lag/run:1}
+    let best=-1;
+    for(let lag=minLag;lag<=maxLag;lag++){if(d[lag]<0.18){while(lag+1<=maxLag&&d[lag+1]<d[lag])lag++;best=lag;break}}
+    if(best<0)continue;
+    // parabolic interpolation
+    const a=d[best-1]??d[best],b=d[best],c=d[best+1]??d[best];const den=a-2*b+c;const shift=den?0.5*(a-c)/den:0;
+    fr.f0=sr/(best+shift);
+  }
+  return frames;
+}
+function medianOf(a){if(!a.length)return 0;const s=[...a].sort((x,y)=>x-y);return s[Math.floor(s.length/2)]}
+function smoothPitch(frames){
+  // remove octave jumps and smooth voiced runs with a 5-frame median
+  const f=frames.map(x=>x.f0);const out=f.slice();
+  for(let i=0;i<f.length;i++){if(!f[i])continue;const w=[];for(let k=-2;k<=2;k++)if(f[i+k])w.push(f[i+k]);out[i]=medianOf(w)}
+  for(let i=1;i<out.length;i++){if(out[i]&&out[i-1]){const r=out[i]/out[i-1];if(r>1.8)out[i]/=2;else if(r<0.55)out[i]*=2}}
+  return out;
+}
+function voicedRuns(f0,minLen=6,maxGap=5){
+  const runs=[];let st=-1,last=-1;
+  for(let i=0;i<f0.length;i++){if(f0[i]){if(st<0)st=i;else if(i-last>maxGap){runs.push([st,last]);st=i}last=i}}
+  if(st>=0)runs.push([st,last]);
+  return runs.filter(r=>r[1]-r[0]+1>=minLen);
+}
+function splitSyllables(f0,n){
+  let runs=voicedRuns(f0);
+  if(!runs.length)return [];
+  if(runs.length===n)return runs;
+  // otherwise divide the voiced span evenly
+  const a=runs[0][0],b=runs[runs.length-1][1],len=(b-a+1)/n,out=[];
+  for(let k=0;k<n;k++)out.push([Math.round(a+k*len),Math.round(a+(k+1)*len)-1]);
+  return out;
+}
+function classifyTone(st){
+  // st: semitone curve for one syllable relative to the speaker's reference (0 = typical mid pitch)
+  const n=st.length;if(n<4)return {tone:0};
+  const cut=Math.max(1,Math.floor(n*0.12));const c=st.slice(cut,n-cut>cut+2?n-cut:n);
+  const m=c.length,q=Math.max(1,Math.floor(m/4));
+  const start=medianOf(c.slice(0,q)),end=medianOf(c.slice(m-q)),mid=medianOf(c.slice(q,m-q).length?c.slice(q,m-q):c);
+  let minV=Infinity,minI=0,maxV=-Infinity;c.forEach((v,i)=>{if(v<minV){minV=v;minI=i}if(v>maxV)maxV=v});
+  const delta=end-start,minPos=minI/(m-1||1),mean=c.reduce((x,y)=>x+y,0)/m;
+  const dip=Math.min(start,end)-minV;
+  let tone;
+  if(dip>1.5&&minPos>0.2&&minPos<0.85&&minV<0.5)tone=3;        // fall-rise
+  else if(delta<=-3)tone=(start<-0.5&&end<-3.5)?3:4;            // falling (a low fall counts as half-third)
+  else if(delta>=2)tone=(start<-2.5&&minPos>0.25)?3:2;            // rising
+  else if(mean<-2.5)tone=3;                                        // low and flat
+  else if(Math.abs(delta)<2&&maxV-minV<3.5)tone=1;                 // level
+  else tone=delta<0?4:2;
+  return {tone,start,end,minV,mean,delta,curve:c};
+}
+function analyseTones(pcm,nSyl,refHz){
+  const frames=trackPitch(pcm);const f0=smoothPitch(frames);
+  const voiced=f0.filter(Boolean);if(voiced.length<6)return null;
+  const ref=refHz||medianOf(voiced);
+  const segs=splitSyllables(f0,nSyl);if(segs.length!==nSyl)return null;
+  return {ref,medianHz:medianOf(voiced),syllables:segs.map(([a,b])=>{const st=[];for(let i=a;i<=b;i++)if(f0[i])st.push(12*Math.log2(f0[i]/ref));return classifyTone(st)})};
+}
+function expectedTones(py,text){
+  // dictionary tones -> spoken tones: 3-3 sandhi, 一 and 不 changes; 0 = neutral tone
+  const syl=py.trim().split(/\s+/);const chars=[...text];
+  if(syl.length!==chars.length)return null;
+  const t=syl.map(toneOf);
+  for(let i=0;i<t.length-1;i++){
+    if(chars[i]==='一'&&t[i]===1&&t[i+1])t[i]=t[i+1]===4?2:4;
+    else if(chars[i]==='不'&&t[i]===4&&t[i+1]===4)t[i]=2;
+  }
+  for(let i=t.length-2;i>=0;i--)if(t[i]===3&&t[i+1]===3)t[i]=2;
+  return {syl,tones:t};
+}
+
+/* pronunciation practice: record, play back, score */
+const SCORE_API='/api/score';   // optional Cloudflare Pages Function (functions/api/score.js)
+const SCORE_ENABLED=false;      // set to true only after adding Azure keys; tone analysis works without it
+let pText='',pPy='',recorder=null,chunks=[],recUrl=null,recognizer=null,heard=[],recTimer=null;
+function openPractice(text,py,gloss){
+  pText=text;pPy=py||'';$('#pTarget').textContent=text;$('#pTarget').classList.toggle('long',text.length>8);
+  $('#pPinyin').innerHTML=py?colorPinyin(escapeHtml(py)):'';$('#pGloss').textContent=gloss||'';
+  $('#pResult').hidden=true;$('#pPlayback').disabled=true;if(recUrl){URL.revokeObjectURL(recUrl);recUrl=null}
+  setStatus('Listen to the model, then record yourself saying it.');$('#practice').hidden=false;
+}
+function setStatus(t){$('#pStatus').textContent=t}
+$('#pClose').onclick=()=>{stopRecording(true);$('#practice').hidden=true};
+$('#pListen').onclick=()=>speak(pText,pText.length>8?0.8:0.7);
+$('#pPlayback').onclick=()=>{if(recUrl)new Audio(recUrl).play()};
+$('#pRec').onclick=()=>{recorder&&recorder.state==='recording'?stopRecording():startRecording()};
+async function startRecording(){
+  if(!navigator.mediaDevices||!window.MediaRecorder){setStatus('This browser cannot record audio. Try Chrome, Edge or Safari.');return}
+  let stream;
+  try{stream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true}})}
+  catch(e){setStatus(e&&e.name==='NotAllowedError'?'Microphone access was blocked. Allow the microphone for this site in your browser settings, then try again.':'The microphone is not available here. Recording works on the published website in Chrome, Edge or Safari.');return}
+  chunks=[];heard=[];
+  recorder=new MediaRecorder(stream);
+  recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+  recorder.onstop=()=>{stream.getTracks().forEach(t=>t.stop());if(recorder._cancel)return;handleRecording(new Blob(chunks,{type:recorder.mimeType||'audio/webm'}))};
+  recorder.start();
+  startRecognizer();
+  $('#pRec').textContent='■ Stop';$('#pResult').hidden=true;setStatus('Recording… say it now, then press Stop.');
+  const maxMs=Math.min(30000,2500+pText.length*450);recTimer=setTimeout(()=>stopRecording(),maxMs);
+}
+function stopRecording(cancel){clearTimeout(recTimer);if(recorder&&recorder.state==='recording'){recorder._cancel=!!cancel;recorder.stop()}
+  if(recognizer){try{recognizer.stop()}catch(e){}}$('#pRec').textContent='● Record'}
+function startRecognizer(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){recognizer=null;return}
+  recognizer=new SR();recognizer.lang='zh-CN';recognizer.interimResults=false;recognizer.maxAlternatives=5;
+  recognizer.onresult=e=>{for(const r of e.results)for(const a of r)heard.push(a.transcript.replace(/[，。？！、\s]/g,''))};
+  recognizer.onerror=()=>{};try{recognizer.start()}catch(e){recognizer=null}
+}
+function loadBaseline(){try{const v=JSON.parse(localStorage.getItem('toneBaseline')||'[]');return Array.isArray(v)?v:[]}catch(e){return []}}
+function saveBaseline(hz){const v=loadBaseline();v.push(hz);try{localStorage.setItem('toneBaseline',JSON.stringify(v.slice(-12)))}catch(e){}}
+let sessionBaseline=[];
+function baselineHz(){const all=[...loadBaseline(),...sessionBaseline];return all.length?medianOf(all):0}
+async function handleRecording(blob){
+  recUrl=URL.createObjectURL(blob);$('#pPlayback').disabled=false;setStatus('Analysing your tones…');
+  let pcm=null;try{pcm=await decodeTo16k(blob)}catch(e){pcm=null}
+  // 1. free, on-device tone analysis
+  let toneResult=null;const exp=pPy?expectedTones(pPy,pText):null;
+  if(pcm&&exp&&exp.tones.length<=6){
+    const a=analyseTones(pcm,exp.tones.length,baselineHz()||undefined);
+    if(a){sessionBaseline.push(a.medianHz);saveBaseline(a.medianHz);toneResult={exp,a}}
+  }
+  // 2. optional detailed scoring, only if the site owner set up the scoring service
+  let azure=null;
+  if(pcm&&SCORE_ENABLED){try{const r=await fetch(`${SCORE_API}?ref=${encodeURIComponent(pText)}`,{method:'POST',headers:{'Content-Type':'audio/wav'},body:wavFromPcm(pcm)});if(r.ok)azure=await r.json()}catch(e){azure=null}}
+  // 3. free browser recognizer result
+  await new Promise(r=>setTimeout(r,600));
+  showResult(toneResult,azure,pcm);
+}
+function curveSVG(curve,want,got){
+  const W=72,H=36,p=4;if(!curve||curve.length<2)return '';
+  const lo=-8,hi=8,y=v=>H-p-(Math.max(lo,Math.min(hi,v))-lo)/(hi-lo)*(H-2*p);
+  const d=curve.map((v,i)=>`${i?'L':'M'}${(p+i*(W-2*p)/(curve.length-1)).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const col=got===want||!want?'var(--jade)':'var(--cinnabar)';
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true"><line x1="${p}" x2="${W-p}" y1="${y(0)}" y2="${y(0)}" stroke="var(--line)"/><path d="${d}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/></svg>`;
+}
+const TONE_NAMES=['light','1st (high level)','2nd (rising)','3rd (low dip)','4th (falling)'];
+function showResult(tr,azure,pcm){
+  const tiles=[],notes=[];let charsHtml='';
+  if(tr){
+    const {exp,a}=tr;let match=0,count=0;
+    const rows=exp.tones.map((want,i)=>{const s=a.syllables[i],got=s.tone;const ok=!want||got===want;if(want){count++;if(ok)match++}
+      return {ch:[...pText][i],py:exp.syl[i],want,got,ok,curve:s.curve}});
+    if(count){tiles.push([Math.round(match/count*100),'Tones']);}
+    charsHtml=rows.map(r=>`<span class="${!r.want?'':r.ok?'ok':'bad'}" style="display:grid;justify-items:center;gap:2px;padding:6px 8px"><span style="border:0;padding:0;font-size:1.4rem">${escapeHtml(r.ch)}</span>${curveSVG(r.curve,r.want,r.got)}<small style="font-family:var(--body);font-size:.72rem">${r.want?`${r.ok?'✓':'✗'} you: ${r.got||'?'} · want: ${r.want}`:'light tone'}</small></span>`).join('');
+    const wrong=rows.filter(r=>r.want&&!r.ok);
+    notes.push(wrong.length?wrong.map(r=>`${r.ch} (${r.py}) should be ${TONE_NAMES[r.want]}, it sounded ${TONE_NAMES[r.got]||'unclear'}.`).join(' '):'Every tone matched. Try it again a little faster.');
+    if(!loadBaseline().length||loadBaseline().length<3)notes.push('Tone detection gets more accurate after a few recordings, as it learns your voice range.');
+  }
+  if(heard.length){const target=pText.replace(/[，。？！、“”\s]/g,'');const best=heard.map(h=>({h,s:charMatch(target,h)})).sort((x,y)=>y.s-x.s)[0];
+    tiles.push([Math.round(best.s*100),'Recognized']);
+    if(!tr)charsHtml=[...target].map(ch=>`<span class="${best.h.includes(ch)?'ok':'bad'}">${escapeHtml(ch)}</span>`).join('');
+    notes.push(`The speech recognizer heard: ${best.h}`);}
+  if(azure&&typeof azure.overall==='number'){
+    [['Overall',azure.overall],['Accuracy',azure.accuracy],['Fluency',azure.fluency]].forEach(([k,v])=>v!=null&&tiles.push([Math.round(v),k]));}
+  if(!tiles.length){
+    setStatus(!pcm?'The recording could not be read. Try again.':pPy?'No clear voice was found in the recording. Speak a little louder and closer to the microphone.':'Recorded. Play it back and compare it with the model.');return}
+  $('#pScores').innerHTML=tiles.map(([v,k])=>`<div class="sc"><b>${v}</b><span>${k}</span></div>`).join('');
+  $('#pChars').innerHTML=charsHtml;$('#pNote').textContent=notes.join(' ');
+  setStatus(tr?'Each curve is your pitch. Compare its shape with the tone cards above.':'Long sentences get a recognition check; tone analysis covers words of up to six characters.');
+  $('#pResult').hidden=false;
+}
+function charMatch(t,h){if(!t.length)return 0;let n=0;for(const ch of t)if(h.includes(ch))n++;return n/t.length}
+async function decodeTo16k(blob){
+  const buf=await blob.arrayBuffer();
+  const Ctx=window.AudioContext||window.webkitAudioContext;const ctx=new Ctx();
+  const audio=await new Promise((res,rej)=>ctx.decodeAudioData(buf,res,rej));ctx.close&&ctx.close();
+  const rate=TONE_SR,len=Math.max(1,Math.ceil(audio.duration*rate));
+  const off=new OfflineAudioContext(1,len,rate);const src=off.createBufferSource();src.buffer=audio;src.connect(off.destination);src.start();
+  return (await off.startRendering()).getChannelData(0);
+}
+function wavFromPcm(pcm){
+  const rate=TONE_SR,out=new DataView(new ArrayBuffer(44+pcm.length*2));
+  const w=(o,s)=>[...s].forEach((c,i)=>out.setUint8(o+i,c.charCodeAt(0)));
+  w(0,'RIFF');out.setUint32(4,36+pcm.length*2,true);w(8,'WAVE');w(12,'fmt ');out.setUint32(16,16,true);out.setUint16(20,1,true);out.setUint16(22,1,true);
+  out.setUint32(24,rate,true);out.setUint32(28,rate*2,true);out.setUint16(32,2,true);out.setUint16(34,16,true);w(36,'data');out.setUint32(40,pcm.length*2,true);
+  for(let i=0;i<pcm.length;i++){const s=Math.max(-1,Math.min(1,pcm[i]));out.setInt16(44+i*2,s<0?s*0x8000:s*0x7fff,true)}
+  return new Blob([out],{type:'audio/wav'});
+}
+
+/* tones */
+const TONES=[
+ {n:1,name:'1st · high level',contour:'55',pts:[5,5],ex:'妈',py:'mā'},
+ {n:2,name:'2nd · rising',contour:'35',pts:[3,5],ex:'麻',py:'má'},
+ {n:3,name:'3rd · dip',contour:'214',pts:[2,1,4],ex:'马',py:'mǎ'},
+ {n:4,name:'4th · falling',contour:'51',pts:[5,1],ex:'骂',py:'mà'}];
+function contourSVG(t){
+  const W=160,H=70,pad=8,y=v=>H-pad-(v-1)*(H-2*pad)/4;
+  const xs=t.pts.map((_,i)=>pad+i*(W-2*pad)/(t.pts.length-1));
+  let grid='';for(let i=1;i<=5;i++)grid+=`<line x1="${pad}" x2="${W-pad}" y1="${y(i)}" y2="${y(i)}" stroke="var(--line)" stroke-width="1"/>`;
+  const d=t.pts.map((v,i)=>`${i?'L':'M'}${xs[i]},${y(v)}`).join(' ');
+  return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">${grid}<path d="${d}" fill="none" stroke="${TONE_COLORS[t.n-1]}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+$('#toneCards').innerHTML=TONES.map(t=>`<button class="tone" type="button" data-say="${t.ex}"><span class="lbl">${t.name} · ${t.contour}</span>${contourSVG(t)}<span><span class="ch">${t.ex}</span> ${t.py}</span></button>`).join('');
+$('#toneCards').addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(b)speak(b.dataset.say,0.6)});
+const QSYL=[['八','bā',1,'eight'],['拔','bá',2,'pull out'],['把','bǎ',3,'hold'],['爸','bà',4,'dad'],['汤','tāng',1,'soup'],['糖','táng',2,'sugar'],['躺','tǎng',3,'lie down'],['烫','tàng',4,'scalding'],['书','shū',1,'book'],['熟','shú',2,'ripe'],['鼠','shǔ',3,'mouse'],['树','shù',4,'tree'],['衣','yī',1,'clothing'],['姨','yí',2,'aunt'],['椅','yǐ',3,'chair'],['意','yì',4,'meaning'],['居','jū',1,'reside'],['局','jú',2,'bureau'],['举','jǔ',3,'lift'],['句','jù',4,'sentence']];
+let qi=null,answered=false,right=0,total=0;
+function nextQuiz(){qi=QSYL[Math.floor(Math.random()*QSYL.length)];answered=false;$('#quizReveal').textContent='';
+  $('#quizChoices').innerHTML=[1,2,3,4].map(n=>`<button class="choice" type="button" data-t="${n}">Tone ${n}</button>`).join('')}
+$('#quizPlay').onclick=()=>qi&&speak(qi[0],0.6);
+$('#quizNext').onclick=()=>{nextQuiz();speak(qi[0],0.6)};
+$('#quizChoices').addEventListener('click',e=>{const b=e.target.closest('.choice');if(!b||answered)return;answered=true;total++;
+  const ok=+b.dataset.t===qi[2];if(ok)right++;
+  b.classList.add(ok?'right':'wrong');if(!ok)$(`.choice[data-t="${qi[2]}"]`).classList.add('right');
+  $('#quizReveal').innerHTML=`<span class="han" style="font-size:1.3rem">${qi[0]}</span> ${qi[1]} · ${qi[3]}`;
+  $('#quizScore').textContent=`${right} / ${total}`});
+nextQuiz();
+
+/* HSKK */
+const KK=[
+ {name:'Beginner',info:'For HSK 1–2 learners, about 200 words. Around 20 minutes including preparation. Three parts: listen and repeat (15), listen and answer (10), answer questions (2).',
+  tasks:[
+   {t:'Listen and repeat',meta:'Part 1 · 15 sentences',mode:'repeat',items:[['我每天七点起床。','I get up at seven every day.'],['这个苹果很好吃。','This apple is delicious.'],['你明天去哪儿？','Where are you going tomorrow?'],['我想喝一杯水。','I would like a glass of water.'],['他是我的中国朋友。','He is my Chinese friend.']]},
+   {t:'Listen and answer',meta:'Part 2 · 10 questions · answer in a short sentence',mode:'answer',items:[['你喜欢什么颜色？','What color do you like?'],['你家有几口人？','How many people are in your family?'],['你今天怎么来的？','How did you get here today?'],['你会说汉语吗？','Can you speak Chinese?']]},
+   {t:'Answer questions',meta:'Part 3 · 2 questions · about 1.5 min each',mode:'talk',sec:90,prep:0,items:[['请介绍一下你的家。','Describe your family.'],['你周末一般做什么？','What do you usually do at the weekend?'],['你喜欢吃什么菜？为什么？','What food do you like, and why?']]}]},
+ {name:'Intermediate',info:'For HSK 3–4 learners, about 900 words. Around 21 minutes with 10 minutes to prepare. Three parts: listen and repeat (10), describe a picture (2), answer questions (2).',
+  tasks:[
+   {t:'Listen and repeat',meta:'Part 1 · 10 sentences',mode:'repeat',items:[['虽然今天下雨，但是我们还是去了公园。','Although it rained today, we still went to the park.'],['如果你有时间的话，我们一起去看电影吧。','If you have time, let’s go to a film together.'],['他已经在这家公司工作三年了。','He has worked at this company for three years.'],['我把作业忘在家里了。','I left my homework at home.']]},
+   {t:'Describe a picture',meta:'Part 2 · 2 pictures · about 2 min each',mode:'talk',sec:120,prep:0,items:[['（图片）一家人在饭馆里吃饭，一个孩子在哭。','Picture: a family is eating at a restaurant and a child is crying. Say who is there, what is happening, and why.'],['（图片）一个年轻人在机场看手机，旁边有很大的行李箱。','Picture: a young person at an airport looks at a phone next to a big suitcase. Where are they going? How do they feel?']]},
+   {t:'Answer questions',meta:'Part 3 · 2 questions · about 2 min each',mode:'talk',sec:120,prep:0,items:[['你觉得学习外语最难的是什么？','What is the hardest part of learning a foreign language?'],['请谈谈你最喜欢的一个城市。','Talk about a city you like most.'],['你更喜欢一个人旅游还是和朋友一起？','Do you prefer travelling alone or with friends?']]}]},
+ {name:'Advanced',info:'For HSK 5–6 learners, 3,000+ words. Around 25 minutes with 10 minutes to prepare. Three parts: listen and retell (3), read aloud (1), answer questions (2).',
+  tasks:[
+   {t:'Listen and retell',meta:'Part 1 · 3 short passages · retell in your own words',mode:'repeat',items:[['小王第一次去面试的时候非常紧张，说话的声音一直在发抖。面试结束后，他觉得自己一定没有希望了。没想到一个星期以后，公司打电话通知他被录取了。经理说，他们看重的不是他说得多流利，而是他回答问题时的真诚。','Xiao Wang was very nervous at his first interview and thought he had failed. A week later he got the job: the manager valued his sincerity more than his fluency.']]},
+   {t:'Read aloud',meta:'Part 2 · 1 passage · about 2 min',mode:'read',items:[['每天早上，我都会去公园跑步。公园里有很多老人在打太极拳，也有年轻人在遛狗。春天的时候，湖边的柳树长出新芽，空气里都是花的香味。跑完步，我喜欢坐在长椅上，看太阳慢慢升起来。这短短的一个小时，是我一天里最安静的时间。','A morning run in the park: tai chi, dogs, spring willows, and watching the sunrise.']]},
+   {t:'Answer questions',meta:'Part 3 · 2 questions · about 2.5 min each',mode:'talk',sec:150,prep:0,items:[['你认为科技让人与人之间的关系更近了还是更远了？','Has technology brought people closer together or pushed them apart?'],['有人说“失败是成功之母”，你怎么看？','“Failure is the mother of success.” Do you agree?'],['你觉得城市生活和农村生活各有什么优点？','What are the advantages of city life and of country life?']]}]}];
+let kkLevel=1,timers=[];
+function fmt(s){return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`}
+function renderKK(){
+  timers.forEach(clearInterval);timers=[];
+  const L=KK[kkLevel];$('#kkInfo').textContent=L.info;
+  $('#tasks').innerHTML=L.tasks.map((t,ti)=>`
+    <div class="panel task" data-ti="${ti}" data-idx="0">
+      <div class="task-head"><h3>${t.t}</h3><span class="task-meta">${t.meta}</span></div>
+      <div class="prompt${t.mode==='repeat'?' masked':''}"></div>
+      <div class="en-hint"></div>
+      ${t.mode==='talk'?`<div class="toolbar"><span class="timer">${fmt(t.sec)}</span><span class="phase">ready</span></div>`:''}
+      <div class="toolbar">
+        ${t.mode!=='read'||true?`<button class="btn" type="button" data-act="play">▶ ${t.mode==='read'?'Hear model reading':t.mode==='talk'?'Hear question':'Play'}</button>`:''}
+        ${t.mode==='repeat'?'<button class="btn ghost" type="button" data-act="show">Show text</button>':''}
+        ${(t.mode==='repeat'||t.mode==='read')?'<button class="btn ghost" type="button" data-act="practice">● Record &amp; score</button>':''}
+        ${t.mode==='talk'?'<button class="btn ghost" type="button" data-act="timer">Start speaking</button>':''}
+        ${t.items.length>1?'<button class="btn ghost" type="button" data-act="next">Next</button>':''}
+      </div>
+    </div>`).join('');
+  document.querySelectorAll('.task').forEach(fill);
+}
+function fill(card){const t=KK[kkLevel].tasks[card.dataset.ti],it=t.items[card.dataset.idx];
+  card.querySelector('.prompt').textContent=it[0];card.querySelector('.en-hint').textContent=it[1];
+  if(t.mode==='repeat')card.querySelector('.prompt').classList.add('masked');
+  const tm=card.querySelector('.timer');if(tm){stopTimer(card);tm.textContent=fmt(t.sec);tm.classList.remove('low');card.querySelector('.phase').textContent='ready';card.querySelector('[data-act="timer"]').textContent='Start speaking'}
+}
+function stopTimer(card){if(card._tid){clearInterval(card._tid);card._tid=null}}
+$('#tasks').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const card=b.closest('.task');const t=KK[kkLevel].tasks[card.dataset.ti];const it=t.items[card.dataset.idx];
+  const act=b.dataset.act;
+  if(act==='play')speak(it[0].replace(/（图片）/,''),t.mode==='read'?0.85:0.8);
+  if(act==='show')card.querySelector('.prompt').classList.toggle('masked');
+  if(act==='practice')openPractice(it[0],'',it[1]);
+  if(act==='next'){card.dataset.idx=(+card.dataset.idx+1)%t.items.length;fill(card)}
+  if(act==='timer'){
+    if(card._tid){stopTimer(card);b.textContent='Resume';card.querySelector('.phase').textContent='paused';return}
+    let left=card._left??t.sec;if(left<=0)left=t.sec;const tm=card.querySelector('.timer');
+    b.textContent='Pause';card.querySelector('.phase').textContent='speaking';
+    card._tid=setInterval(()=>{left--;card._left=left;tm.textContent=fmt(Math.max(left,0));tm.classList.toggle('low',left<=15);
+      if(left<=0){stopTimer(card);card._left=t.sec;card.querySelector('.phase').textContent='time is up';b.textContent='Start again'}},1000);
+    timers.push(card._tid);
+  }
+});
+seg($('#kkSeg'),KK.map(k=>'HSKK '+k.name),i=>{kkLevel=i;renderKK()},1);renderKK();
+
+/* pronunciation */
+const PAIRS=[
+ ['z vs zh — tongue flat vs curled back',['资','zī','capital'],['知','zhī','know']],
+ ['s vs sh',['四','sì','four'],['是','shì','to be']],
+ ['c vs ch',['粗','cū','thick'],['出','chū','go out']],
+ ['x vs sh',['西','xī','west'],['师','shī','teacher']],
+ ['q vs ch',['七','qī','seven'],['吃','chī','eat']],
+ ['ü vs u',['女','nǚ','female'],['努','nǔ','strive']],
+ ['en vs eng',['门','mén','door'],['盟','méng','alliance']],
+ ['in vs ing',['金','jīn','gold'],['京','jīng','capital city']]];
+$('#pairs').innerHTML=PAIRS.map(p=>`<div class="panel pair"><span class="pair-head">${p[0]}</span>${[p[1],p[2]].map(w=>`<button type="button" data-say="${w[0]}"><span class="ch">${w[0]}</span><span>${w[1]} · <span class="note">${w[2]}</span></span></button>`).join('<span class="vs">vs</span>')}</div>`).join('');
+$('#pairs').addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(b)speak(b.dataset.say,0.6)});
+const RULES=[
+ ['你好','Two 3rd tones in a row: the first becomes 2nd. Say ní hǎo.'],
+ ['一天 · 一个','一 is yì before tones 1–3 (yì tiān) and yí before tone 4 (yí gè).'],
+ ['不对','不 becomes bú before a 4th tone: bú duì.'],
+ ['朋友','Neutral tone: the second syllable is short and light. péngyou.'],
+ ['东西','dōngxi (light xi) means “thing”; dōngxī means “east and west”.']];
+$('#rules').innerHTML=RULES.map(r=>`<div class="rule"><div><div class="ex">${r[0]}</div><div class="how">${r[1]}</div></div><button class="play" type="button" aria-label="Play ${r[0]}" data-say="${r[0].replace(' · ','，')}">▶</button></div>`).join('');
+$('#rules').addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(b)speak(b.dataset.say,0.65)});
+</script>
