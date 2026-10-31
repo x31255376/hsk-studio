@@ -1,5 +1,11 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Free HSK and HSKK prep in English: the full HSK 3.0 word list, tone training, HSKK speaking practice and on-device pronunciation checks.">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;-webkit-text-size-adjust:100%}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>HSK &amp; HSKK Studio</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:wght@400;500;600&family=Noto+Serif+SC:wght@500;700&display=swap">
 <style>
@@ -144,6 +150,8 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
 
+</head>
+<body>
 <header class="wrap hero">
   <div>
     <div class="eyebrow">Hanyu Shuiping Kaoshi · 汉语水平考试</div>
@@ -306,22 +314,22 @@ seg($('#lvlSeg'),[1,2,3,4,5,6].map(n=>'HSK '+n),showLevel,3);showLevel(3);
 let VOCAB=null,vl=1,order=[],showAll=false,shown=0,query='';
 const PAGE=60;
 function escapeHtml(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function plain(py){return py.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/ü/g,'v').replace(/\s+/g,'').toLowerCase()}
+function plain(py){return py.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ü/g,'v').replace(/\s+/g,'').toLowerCase()}
 function currentList(){
   // each entry: [hanzi, pinyin, gloss, level]
-  const lv=vl===0?[0,1,2,3,4,5]:[vl-1];
+  const lv=(vl===0||query.trim())?[0,1,2,3,4,5]:[vl-1];
   let list=[];lv.forEach(i=>VOCAB[i].forEach((w,k)=>list.push([w[0],w[1],w[2],i+1])));
   if(query){const q=query.trim().toLowerCase(),qp=plain(q);
     list=list.filter(w=>w[0].includes(q)||plain(w[1]).startsWith(qp)||plain(w[1]).includes(qp)&&qp.length>2||w[2].toLowerCase().includes(q))}
   return list;
 }
 function rebuild(){if(!VOCAB)return;order=currentList();shown=0;$('#cards').innerHTML='';renderMore()}
-function cardHtml(w,idx){return `<button class="card" type="button" data-idx="${idx}" data-hidden="${showAll?0:1}"><span class="ch">${escapeHtml(w[0])}</span><span class="py">${colorPinyin(escapeHtml(w[1]))}</span><span class="en">${escapeHtml(w[2])}${vl===0?` · HSK ${w[3]}`:''}</span></button>`}
+function cardHtml(w,idx){return `<button class="card" type="button" data-idx="${idx}" data-hidden="${showAll?0:1}"><span class="ch">${escapeHtml(w[0])}</span><span class="py">${colorPinyin(escapeHtml(w[1]))}</span><span class="en">${escapeHtml(w[2])}${(vl===0||query.trim())?` · HSK ${w[3]}`:''}</span></button>`}
 function renderMore(){
   const next=order.slice(shown,shown+PAGE);
   $('#cards').insertAdjacentHTML('beforeend',next.map((w,i)=>cardHtml(w,shown+i)).join(''));
   shown+=next.length;
-  const scope=vl===0?'HSK 1–6':`HSK ${vl}`;
+  const scope=(vl===0||query.trim())?'HSK 1–6':`HSK ${vl}`;
   $('#vocabCount').textContent=order.length?`${order.length.toLocaleString()} words in ${scope}${query?` matching “${query}”`:''} · showing ${shown.toLocaleString()}`:`No words in ${scope} match “${query}”.`;
   $('#more').hidden=shown>=order.length;
 }
@@ -371,40 +379,49 @@ function voicedRuns(f0,minLen=6,maxGap=5){
   if(st>=0)runs.push([st,last]);
   return runs.filter(r=>r[1]-r[0]+1>=minLen);
 }
-function splitSyllables(f0,n){
+function splitSyllables(f0,n,frames){
   let runs=voicedRuns(f0);
   if(!runs.length)return [];
   if(runs.length===n)return runs;
-  // otherwise divide the voiced span evenly
-  const a=runs[0][0],b=runs[runs.length-1][1],len=(b-a+1)/n,out=[];
-  for(let k=0;k<n;k++)out.push([Math.round(a+k*len),Math.round(a+(k+1)*len)-1]);
-  return out;
+  // otherwise cut the voiced span at the quietest frames near each even boundary (syllables dip in loudness between them)
+  const a=runs[0][0],b=runs[runs.length-1][1],len=(b-a+1)/n,cuts=[];
+  for(let k=1;k<n;k++){const c=Math.round(a+k*len),w=Math.max(2,Math.round(len*0.3));let best=c,bv=Infinity;
+    for(let i=Math.max(a+2,c-w);i<=Math.min(b-2,c+w);i++){const v=frames?(frames[i].rms*(f0[i]?1:0.5)):0;if(v<bv){bv=v;best=i}}cuts.push(best)}
+  const out=[];let s=a;for(const c of cuts){out.push([s,c-1]);s=c+1}out.push([s,b]);
+  return out.filter(r=>r[1]>r[0]).length===n?out:[];
 }
-function classifyTone(st){
-  // st: semitone curve for one syllable relative to the speaker's reference (0 = typical mid pitch)
-  const n=st.length;if(n<4)return {tone:0};
-  const cut=Math.max(1,Math.floor(n*0.12));const c=st.slice(cut,n-cut>cut+2?n-cut:n);
+function pct(a,p){if(!a.length)return 0;const s=[...a].sort((x,y)=>x-y);return s[Math.min(s.length-1,Math.max(0,Math.round(p*(s.length-1))))]}
+function classifyTone(chao){
+  // chao: pitch curve for one syllable on the 1–5 Chao scale (1 = bottom of the speaker's range, 5 = top)
+  const n=chao.length;if(n<4)return {tone:0};
+  const cut=Math.max(1,Math.floor(n*0.12));const c=chao.slice(cut,n-cut>cut+2?n-cut:n);
   const m=c.length,q=Math.max(1,Math.floor(m/4));
-  const start=medianOf(c.slice(0,q)),end=medianOf(c.slice(m-q)),mid=medianOf(c.slice(q,m-q).length?c.slice(q,m-q):c);
+  const start=medianOf(c.slice(0,q)),end=medianOf(c.slice(m-q));
   let minV=Infinity,minI=0,maxV=-Infinity;c.forEach((v,i)=>{if(v<minV){minV=v;minI=i}if(v>maxV)maxV=v});
-  const delta=end-start,minPos=minI/(m-1||1),mean=c.reduce((x,y)=>x+y,0)/m;
-  const dip=Math.min(start,end)-minV;
+  const delta=end-start,minPos=minI/(m-1||1),mean=c.reduce((x,y)=>x+y,0)/m,dip=Math.min(start,end)-minV;
   let tone;
-  if(dip>1.5&&minPos>0.2&&minPos<0.85&&minV<0.5)tone=3;        // fall-rise
-  else if(delta<=-3)tone=(start<-0.5&&end<-3.5)?3:4;            // falling (a low fall counts as half-third)
-  else if(delta>=2)tone=(start<-2.5&&minPos>0.25)?3:2;            // rising
-  else if(mean<-2.5)tone=3;                                        // low and flat
-  else if(Math.abs(delta)<2&&maxV-minV<3.5)tone=1;                 // level
-  else tone=delta<0?4:2;
+  if((dip>0.6&&minPos>0.2&&minPos<0.85&&minV<2.6)||
+     (dip>0.25&&minPos>=0.35&&minPos<=0.8&&minV<2.0))tone=3;       // dip then rise: 214 (a 2nd tone may dip slightly, but only early and not to the floor)
+  else if(delta<=-1){tone=start>=3.6&&delta<=-1.4?4:3}              // high fall 51 = 4th; low fall 21 = half-3rd
+  else if(delta>=0.9){tone=start<=1.8&&minPos>0.25?3:2}             // rise 35 = 2nd; rise from the floor after a low part = 3rd
+  else if(mean<2.4)tone=3;                                           // low and level
+  else tone=1;                                                       // high level 55
   return {tone,start,end,minV,mean,delta,curve:c};
 }
-function analyseTones(pcm,nSyl,refHz){
+function analyseTones(pcm,nSyl,base){
+  // base: optional {lo,hi} Hz range learned from this speaker's earlier recordings
   const frames=trackPitch(pcm);const f0=smoothPitch(frames);
   const voiced=f0.filter(Boolean);if(voiced.length<6)return null;
-  const ref=refHz||medianOf(voiced);
-  const segs=splitSyllables(f0,nSyl);if(segs.length!==nSyl)return null;
-  return {ref,medianHz:medianOf(voiced),syllables:segs.map(([a,b])=>{const st=[];for(let i=a;i<=b;i++)if(f0[i])st.push(12*Math.log2(f0[i]/ref));return classifyTone(st)})};
+  let lo=pct(voiced,0.05),hi=pct(voiced,0.95);
+  if(base&&base.lo&&base.hi){lo=Math.min(lo,base.lo);hi=Math.max(hi,base.hi)}
+  // a single syllable or a narrow utterance tells us little about the range: assume at least ~7 semitones
+  const span=12*Math.log2(hi/lo);
+  if(span<7){const mid=Math.sqrt(lo*hi),half=2**(7/24);lo=mid/half;hi=mid*half}
+  const toChao=f=>1+4*Math.max(0,Math.min(1,Math.log2(f/lo)/Math.log2(hi/lo)));
+  const segs=splitSyllables(f0,nSyl,frames);if(segs.length!==nSyl)return null;
+  return {lo:pct(voiced,0.05),hi:pct(voiced,0.95),syllables:segs.map(([a,b])=>{const ch=[];for(let i=a;i<=b;i++)if(f0[i])ch.push(toChao(f0[i]));return classifyTone(ch)})};
 }
+
 function expectedTones(py,text){
   // dictionary tones -> spoken tones: 3-3 sandhi, 一 and 不 changes; 0 = neutral tone
   const syl=py.trim().split(/\s+/);const chars=[...text];
@@ -418,13 +435,24 @@ function expectedTones(py,text){
   return {syl,tones:t};
 }
 
+function retone(syl,t){
+  // put tone mark t (0 = none) on the vowel that carries the mark in this syllable
+  const marks={a:'āáǎà',e:'ēéěè',i:'īíǐì',o:'ōóǒò',u:'ūúǔù',ü:'ǖǘǚǜ'};
+  const base=syl.normalize('NFD').replace(/[\u0304\u0301\u030c\u0300]/g,'').normalize('NFC');
+  const idx=[...syl].findIndex(ch=>/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(ch));if(idx<0)return syl;
+  const chars=[...base],v=chars[idx];if(!t||!marks[v])return chars.join('');
+  chars[idx]=marks[v][t-1];return chars.join('');
+}
 /* pronunciation practice: record, play back, score */
 const SCORE_API='/api/score';   // optional Cloudflare Pages Function (functions/api/score.js)
 const SCORE_ENABLED=false;      // set to true only after adding Azure keys; tone analysis works without it
 let pText='',pPy='',recorder=null,chunks=[],recUrl=null,recognizer=null,heard=[],recTimer=null;
 function openPractice(text,py,gloss){
   pText=text;pPy=py||'';$('#pTarget').textContent=text;$('#pTarget').classList.toggle('long',text.length>8);
-  $('#pPinyin').innerHTML=py?colorPinyin(escapeHtml(py)):'';$('#pGloss').textContent=gloss||'';
+  $('#pPinyin').innerHTML=py?colorPinyin(escapeHtml(py)):'';
+  const ex=py?expectedTones(py,text):null;
+  if(ex){const dict=ex.syl.map(toneOf);if(ex.tones.some((t,i)=>t&&t!==dict[i])){const spoken=ex.syl.map((s,i)=>ex.tones[i]!==dict[i]?retone(s,ex.tones[i]):s).join(' ');
+    $('#pPinyin').innerHTML+=` <span class="note">· say it as</span> ${colorPinyin(escapeHtml(spoken))} <span class="note">(tone change)</span>`}}$('#pGloss').textContent=gloss||'';
   $('#pResult').hidden=true;$('#pPlayback').disabled=true;if(recUrl){URL.revokeObjectURL(recUrl);recUrl=null}
   setStatus('Listen to the model, then record yourself saying it.');$('#practice').hidden=false;
 }
@@ -455,18 +483,18 @@ function startRecognizer(){
   recognizer.onresult=e=>{for(const r of e.results)for(const a of r)heard.push(a.transcript.replace(/[，。？！、\s]/g,''))};
   recognizer.onerror=()=>{};try{recognizer.start()}catch(e){recognizer=null}
 }
-function loadBaseline(){try{const v=JSON.parse(localStorage.getItem('toneBaseline')||'[]');return Array.isArray(v)?v:[]}catch(e){return []}}
-function saveBaseline(hz){const v=loadBaseline();v.push(hz);try{localStorage.setItem('toneBaseline',JSON.stringify(v.slice(-12)))}catch(e){}}
+function loadBaseline(){try{const v=JSON.parse(localStorage.getItem('toneRange')||'[]');return Array.isArray(v)?v.filter(x=>Array.isArray(x)&&x.length===2):[]}catch(e){return []}}
 let sessionBaseline=[];
-function baselineHz(){const all=[...loadBaseline(),...sessionBaseline];return all.length?medianOf(all):0}
+function saveBaseline(lo,hi){if(!(hi/lo>=2**(5/12)))return;sessionBaseline.push([lo,hi]);const v=loadBaseline();v.push([lo,hi]);try{localStorage.setItem('toneRange',JSON.stringify(v.slice(-12)))}catch(e){}}
+function baselineRange(){const all=[...loadBaseline(),...sessionBaseline];if(!all.length)return null;return {lo:medianOf(all.map(x=>x[0])),hi:medianOf(all.map(x=>x[1]))}}
 async function handleRecording(blob){
   recUrl=URL.createObjectURL(blob);$('#pPlayback').disabled=false;setStatus('Analysing your tones…');
   let pcm=null;try{pcm=await decodeTo16k(blob)}catch(e){pcm=null}
   // 1. free, on-device tone analysis
   let toneResult=null;const exp=pPy?expectedTones(pPy,pText):null;
   if(pcm&&exp&&exp.tones.length<=6){
-    const a=analyseTones(pcm,exp.tones.length,baselineHz()||undefined);
-    if(a){sessionBaseline.push(a.medianHz);saveBaseline(a.medianHz);toneResult={exp,a}}
+    const a=analyseTones(pcm,exp.tones.length,baselineRange());
+    if(a){saveBaseline(a.lo,a.hi);toneResult={exp,a}}
   }
   // 2. optional detailed scoring, only if the site owner set up the scoring service
   let azure=null;
@@ -477,10 +505,10 @@ async function handleRecording(blob){
 }
 function curveSVG(curve,want,got){
   const W=72,H=36,p=4;if(!curve||curve.length<2)return '';
-  const lo=-8,hi=8,y=v=>H-p-(Math.max(lo,Math.min(hi,v))-lo)/(hi-lo)*(H-2*p);
+  const lo=1,hi=5,y=v=>H-p-(Math.max(lo,Math.min(hi,v))-lo)/(hi-lo)*(H-2*p);
   const d=curve.map((v,i)=>`${i?'L':'M'}${(p+i*(W-2*p)/(curve.length-1)).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
   const col=got===want||!want?'var(--jade)':'var(--cinnabar)';
-  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true"><line x1="${p}" x2="${W-p}" y1="${y(0)}" y2="${y(0)}" stroke="var(--line)"/><path d="${d}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/></svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true">${[1,3,5].map(v=>`<line x1="${p}" x2="${W-p}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>`).join('')}<path d="${d}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/></svg>`;
 }
 const TONE_NAMES=['light','1st (high level)','2nd (rising)','3rd (low dip)','4th (falling)'];
 function showResult(tr,azure,pcm){
@@ -492,8 +520,8 @@ function showResult(tr,azure,pcm){
     if(count){tiles.push([Math.round(match/count*100),'Tones']);}
     charsHtml=rows.map(r=>`<span class="${!r.want?'':r.ok?'ok':'bad'}" style="display:grid;justify-items:center;gap:2px;padding:6px 8px"><span style="border:0;padding:0;font-size:1.4rem">${escapeHtml(r.ch)}</span>${curveSVG(r.curve,r.want,r.got)}<small style="font-family:var(--body);font-size:.72rem">${r.want?`${r.ok?'✓':'✗'} you: ${r.got||'?'} · want: ${r.want}`:'light tone'}</small></span>`).join('');
     const wrong=rows.filter(r=>r.want&&!r.ok);
-    notes.push(wrong.length?wrong.map(r=>`${r.ch} (${r.py}) should be ${TONE_NAMES[r.want]}, it sounded ${TONE_NAMES[r.got]||'unclear'}.`).join(' '):'Every tone matched. Try it again a little faster.');
-    if(!loadBaseline().length||loadBaseline().length<3)notes.push('Tone detection gets more accurate after a few recordings, as it learns your voice range.');
+    notes.push(wrong.length?wrong.map(r=>`${r.ch} (${r.want!==toneOf(r.py)?retone(r.py,r.want)+', a tone change from '+r.py:r.py}) should be ${TONE_NAMES[r.want]}, it sounded ${TONE_NAMES[r.got]||'unclear'}.`).join(' '):'Every tone matched. Try it again a little faster.');
+    if(loadBaseline().length<3)notes.push('Tone detection gets more accurate after a few recordings, as it learns your voice range.');
   }
   if(heard.length){const target=pText.replace(/[，。？！、“”\s]/g,'');const best=heard.map(h=>({h,s:charMatch(target,h)})).sort((x,y)=>y.s-x.s)[0];
     tiles.push([Math.round(best.s*100),'Recognized']);
@@ -636,3 +664,5 @@ const RULES=[
 $('#rules').innerHTML=RULES.map(r=>`<div class="rule"><div><div class="ex">${r[0]}</div><div class="how">${r[1]}</div></div><button class="play" type="button" aria-label="Play ${r[0]}" data-say="${r[0].replace(' · ','，')}">▶</button></div>`).join('');
 $('#rules').addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(b)speak(b.dataset.say,0.65)});
 </script>
+</body>
+</html>
