@@ -206,6 +206,14 @@ select.search{appearance:auto}
 .mb-item{display:flex;gap:8px;align-items:center;flex-wrap:wrap;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;color:var(--ink)}
 .mb-tones{margin:0;padding-left:1.2em;display:grid;gap:6px;font-size:.95rem}
 
+.deckbar{display:inline-flex;gap:8px;align-items:center;margin-left:auto}
+.deckpos{color:var(--muted);font-size:.85rem}
+.quiz-top{align-items:center}
+.task-head{align-items:center}
+.pr-choices{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.pr-choices .choice{display:grid;gap:2px;justify-items:center}
+.pr-choices .han{font-size:1.6rem}
+.pr-choices .py-choice,.pr-choices .pyl{font-size:1.15rem}
 footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
@@ -222,7 +230,7 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
 </header>
 
 <nav aria-label="Sections"><div class="wrap">
-  <a href="#levels">Levels</a><a href="#vocab">Vocabulary</a><a href="#tones">Tones</a><a href="#listening">Listening</a><a href="#hskk">HSKK speaking</a><a href="#mock">Mock test</a><a href="#progress">My progress</a><a href="#pron">Pronunciation</a>
+  <a href="#levels">Levels</a><a href="#vocab">Vocabulary</a><a href="#tones">Tones</a><a href="#listening">Listening</a><a href="#hskk">HSKK speaking</a><a href="#mock">Mock test</a><a href="#pron">Pronunciation</a><a href="#progress">My progress</a>
 </div></nav>
 
 <main class="wrap">
@@ -273,10 +281,11 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
   <section id="tones">
     <div class="eyebrow">Foundation</div>
     <h2>The four tones</h2>
-    <p class="lede">Tones decide your HSKK pronunciation score and how well you catch HSK listening questions. Tap a card to hear it.</p>
+    <p class="lede">Tones decide your HSKK pronunciation score and how well you catch HSK listening questions. Tap a card to hear it, then drill with words from the HSK list: over a thousand items, shuffled.</p>
     <div class="tones" id="toneCards"></div>
     <div class="panel quiz">
-      <div class="quiz-top"><h3>Tone trainer</h3><span class="score" id="ttScore"></span></div>
+      <div class="quiz-top"><h3>Tone trainer</h3><span class="deckbar"><span class="deckpos num" id="ttPos"></span><button class="btn ghost small" type="button" id="ttShuf">⤮ Shuffle</button></span></div>
+      <span class="score" id="ttScore"></span>
       <div class="seg" id="ttMode" role="group" aria-label="Training mode"></div>
       <p class="note" id="ttAsk"></p>
       <div class="toolbar"><button class="btn" id="ttPlay" type="button">▶ Play</button><button class="btn ghost" id="ttNext" type="button" hidden>Next</button></div>
@@ -290,30 +299,37 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
   <section id="listening">
     <div class="eyebrow">Listening · the largest part of the HSK</div>
     <h2>Listening practice</h2>
-    <p class="lede">Short and long dialogues in the style of each level. Play the audio, choose an answer, then read the transcript and the explanation. Try answering before you look at the transcript.</p>
+    <p class="lede">A bank of more than 300 questions across HSK 1–6: short dialogues, conversations, passages and true-or-false items. Play the audio, answer, then read the transcript and the explanation. Shuffle to drill in a new order.</p>
     <div class="seg" id="lsSeg" role="group" aria-label="Listening level"></div>
     <div class="panel lpanel">
       <div id="lsHead"></div>
       <div class="toolbar"><button class="btn" id="lsPlay" type="button">▶ Play audio</button><button class="btn ghost" id="lsTBtn" type="button">Show transcript</button><span class="note" id="lsPlays"></span></div>
       <div class="transcript" id="lsTranscript" hidden></div>
       <div id="lsQs"></div>
-      <div class="toolbar"><button class="btn ghost" id="lsPrev" type="button">Previous</button><button class="btn ghost" id="lsNext" type="button">Next question</button></div>
+      <div class="toolbar"><button class="btn ghost" id="lsPrev" type="button">Previous</button><button class="btn ghost" id="lsNext" type="button">Next question</button><span class="deckbar"><span class="deckpos num" id="lsPos"></span><button class="btn ghost small" type="button" id="lsShuf">⤮ Shuffle</button></span></div>
     </div>
   </section>
 
   <section id="hskk">
     <div class="eyebrow">Speaking test</div>
     <h2>HSKK task drills</h2>
-    <p class="lede">The HSKK is recorded: you hear or read a prompt and speak into a microphone. Each level is scored out of 100 and you pass with 60. Drill each task type below at your own pace, then take the full mock test further down.</p>
-    <div class="seg" id="kkSeg" role="group" aria-label="HSKK level"></div>
-    <p class="note" id="kkInfo"></p>
-    <div class="tasks" id="tasks"></div>
+    <p class="lede">The HSKK is recorded: you hear or read a prompt and speak into a microphone. Each level is scored out of 100 and you pass with 60. Drill more than 300 prompts by level and task type, shuffled, then take the full mock test below.</p>
+    <div class="seg" id="spLvl" role="group" aria-label="HSKK level"></div>
+    <div class="seg" id="spMode" role="group" aria-label="Task type"></div>
+    <div class="panel task" id="spCard">
+      <div class="task-head"><span class="eyebrow" id="spHead"></span><span class="deckbar"><span class="deckpos num" id="spPos"></span><button class="btn ghost small" type="button" id="spShuf">⤮ Shuffle</button></span></div>
+      <div class="prompt" id="spText"></div>
+      <div class="en-hint" id="spEn"></div>
+      <div class="toolbar" id="spTimerRow" hidden><span class="timer" id="spTimer"></span><span class="phase" id="spPhase">ready</span></div>
+      <div class="toolbar"><button class="btn" id="spPlay" type="button">▶ Play</button><button class="btn ghost" id="spShow" type="button">Show text</button><button class="btn ghost" id="spRec" type="button">● Record &amp; score</button><button class="btn ghost" id="spTime" type="button">Start speaking</button></div>
+      <div class="toolbar"><button class="btn ghost" id="spPrev" type="button">Previous</button><button class="btn ghost" id="spNext" type="button">Next prompt</button></div>
+    </div>
   </section>
 
   <section id="mock">
     <div class="eyebrow">Exam simulation</div>
     <h2>HSKK mock test</h2>
-    <p class="lede">Runs like the real speaking test: preparation time, prompts played once, answers recorded automatically against a countdown. Afterwards you can play back every answer. Recordings stay in this browser.</p>
+    <p class="lede">Runs like the real speaking test: preparation time, prompts played once, answers recorded automatically against a countdown. Every mock draws a fresh set of prompts from the HSKK bank. Afterwards you can play back every answer; recordings stay in this browser.</p>
     <div id="mxSetup" class="panel" style="display:grid;gap:14px">
       <div class="seg" id="mxSeg" role="group" aria-label="Mock test level"></div>
       <p id="mxInfo" class="note"></p>
@@ -330,6 +346,24 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
     <ul class="hist" id="mxHist"></ul>
   </section>
 
+
+  <section id="pron">
+    <div class="eyebrow">Pronunciation</div>
+    <h2>Sounds and tone changes</h2>
+    <p class="lede">Hundreds of real HSK words: similar sounds English speakers mix up, and words whose tones change when spoken. Listen, choose, then record yourself.</p>
+    <div class="seg" id="prMode" role="group" aria-label="Pronunciation drill"></div>
+    <div class="panel quiz" id="prCard">
+      <div class="quiz-top"><span class="eyebrow" id="prHead"></span><span class="deckbar"><span class="deckpos num" id="prPos"></span><button class="btn ghost small" type="button" id="prShuf">⤮ Shuffle</button></span></div>
+      <p class="note" id="prAsk"></p>
+      <div class="toolbar"><button class="btn" id="prPlay" type="button">▶ Play</button></div>
+      <div class="choices pr-choices" id="prChoices"></div>
+      <div class="reveal" id="prReveal"></div>
+      <div class="toolbar"><button class="btn ghost" id="prRec" type="button" hidden>● Record &amp; score</button><button class="btn ghost" id="prNext" type="button">Next</button></div>
+    </div>
+    <h3>The tone-change rules</h3>
+    <div class="panel rules" id="rules"></div>
+  </section>
+
   <section id="progress">
     <div class="eyebrow">Saved in this browser</div>
     <h2>My progress</h2>
@@ -343,14 +377,6 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
     </div>
     <div class="toolbar"><button class="btn ghost small" id="pgReset" type="button">Reset my progress</button>
       <span id="pgConfirm" hidden><span class="warn">Delete all saved progress and recordings?</span> <button class="btn small rec" id="pgYes" type="button">Delete</button> <button class="btn ghost small" id="pgNo" type="button">Cancel</button></span></div>
-  </section>
-
-  <section id="pron">
-    <div class="eyebrow">Pronunciation</div>
-    <h2>Sounds English speakers mix up</h2>
-    <div class="pairs" id="pairs"></div>
-    <h3>Tone changes you need to say, not just read</h3>
-    <div class="panel rules" id="rules"></div>
   </section>
 </main>
 
@@ -610,47 +636,6 @@ const KK=[
    {t:'Answer questions',meta:'Part 3 · 2 questions · about 2.5 min each',mode:'talk',sec:150,prep:0,items:[['你认为科技让人与人之间的关系更近了还是更远了？','Has technology brought people closer together or pushed them apart?'],['有人说“失败是成功之母”，你怎么看？','“Failure is the mother of success.” Do you agree?'],['你觉得城市生活和农村生活各有什么优点？','What are the advantages of city life and of country life?']]}]}];
 let kkLevel=1,timers=[];
 function fmt(s){return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`}
-function renderKK(){
-  timers.forEach(clearInterval);timers=[];
-  const L=KK[kkLevel];$('#kkInfo').textContent=L.info;
-  $('#tasks').innerHTML=L.tasks.map((t,ti)=>`
-    <div class="panel task" data-ti="${ti}" data-idx="0">
-      <div class="task-head"><h3>${t.t}</h3><span class="task-meta">${t.meta}</span></div>
-      <div class="prompt${t.mode==='repeat'?' masked':''}"></div>
-      <div class="en-hint"></div>
-      ${t.mode==='talk'?`<div class="toolbar"><span class="timer">${fmt(t.sec)}</span><span class="phase">ready</span></div>`:''}
-      <div class="toolbar">
-        ${t.mode!=='read'||true?`<button class="btn" type="button" data-act="play">▶ ${t.mode==='read'?'Hear model reading':t.mode==='talk'?'Hear question':'Play'}</button>`:''}
-        ${t.mode==='repeat'?'<button class="btn ghost" type="button" data-act="show">Show text</button>':''}
-        ${(t.mode==='repeat'||t.mode==='read')?'<button class="btn ghost" type="button" data-act="practice">● Record &amp; score</button>':''}
-        ${t.mode==='talk'?'<button class="btn ghost" type="button" data-act="timer">Start speaking</button>':''}
-        ${t.items.length>1?'<button class="btn ghost" type="button" data-act="next">Next</button>':''}
-      </div>
-    </div>`).join('');
-  document.querySelectorAll('.task').forEach(fill);
-}
-function fill(card){const t=KK[kkLevel].tasks[card.dataset.ti],it=t.items[card.dataset.idx];
-  card.querySelector('.prompt').textContent=it[0];card.querySelector('.en-hint').textContent=it[1];
-  if(t.mode==='repeat')card.querySelector('.prompt').classList.add('masked');
-  const tm=card.querySelector('.timer');if(tm){stopTimer(card);tm.textContent=fmt(t.sec);tm.classList.remove('low');card.querySelector('.phase').textContent='ready';card.querySelector('[data-act="timer"]').textContent='Start speaking'}
-}
-function stopTimer(card){if(card._tid){clearInterval(card._tid);card._tid=null}}
-$('#tasks').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const card=b.closest('.task');const t=KK[kkLevel].tasks[card.dataset.ti];const it=t.items[card.dataset.idx];
-  const act=b.dataset.act;
-  if(act==='play')speak(it[0].replace(/（图片）/,''),t.mode==='read'?0.85:0.8);
-  if(act==='show')card.querySelector('.prompt').classList.toggle('masked');
-  if(act==='practice')openPractice(it[0],'',it[1]);
-  if(act==='next'){card.dataset.idx=(+card.dataset.idx+1)%t.items.length;fill(card)}
-  if(act==='timer'){
-    if(card._tid){stopTimer(card);b.textContent='Resume';card.querySelector('.phase').textContent='paused';return}
-    let left=card._left??t.sec;if(left<=0)left=t.sec;const tm=card.querySelector('.timer');
-    b.textContent='Pause';card.querySelector('.phase').textContent='speaking';
-    card._tid=setInterval(()=>{left--;card._left=left;tm.textContent=fmt(Math.max(left,0));tm.classList.toggle('low',left<=15);
-      if(left<=0){stopTimer(card);card._left=t.sec;card.querySelector('.phase').textContent='time is up';b.textContent='Start again'}},1000);
-    timers.push(card._tid);
-  }
-});
-seg($('#kkSeg'),KK.map(k=>'HSKK '+k.name),i=>{kkLevel=i;renderKK()},1);renderKK();
 
 /* pronunciation */
 const PAIRS=[
@@ -662,8 +647,6 @@ const PAIRS=[
  ['ü vs u',['女','nǚ','female'],['努','nǔ','strive']],
  ['en vs eng',['门','mén','door'],['盟','méng','alliance']],
  ['in vs ing',['金','jīn','gold'],['京','jīng','capital city']]];
-$('#pairs').innerHTML=PAIRS.map(p=>`<div class="panel pair"><span class="pair-head">${p[0]}</span>${[p[1],p[2]].map(w=>`<button type="button" data-say="${w[0]}"><span class="ch">${w[0]}</span><span>${w[1]} · <span class="note">${w[2]}</span></span></button>`).join('<span class="vs">vs</span>')}</div>`).join('');
-$('#pairs').addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(b)speak(b.dataset.say,0.6)});
 const RULES=[
  ['你好','Two 3rd tones in a row: the first becomes 2nd. Say ní hǎo.'],
  ['一天 · 一个','一 is yì before tones 1–3 (yì tiān) and yí before tone 4 (yí gè).'],
@@ -674,6 +657,7 @@ $('#rules').innerHTML=RULES.map(r=>`<div class="rule"><div><div class="ex">${r[0
 $('#rules').addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(b)speak(b.dataset.say,0.65)});
 </script>
 <script src="tone.js"></script>
+<script src="banks.js"></script>
 <script src="features.js"></script>
 </body>
 </html>

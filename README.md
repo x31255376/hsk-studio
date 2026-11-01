@@ -12,6 +12,7 @@ English-language prep site for the HSK and HSKK. A static site: no server, no ru
 | `public/audio.js` | Plays pre-generated voice clips from `public/audio/`, falling back to the device voice |
 | `public/tone.js` | Tone analysis shared by the page and `tools/tone_check.js` |
 | `tools/` | `texts.json` (every playable text), `gen_audio.py` (Azure neural voice generator), `tone_check.js`, `overrides.json` |
+| `public/banks.js` | Question banks: listening (300+), HSKK prompts (300+), pronunciation pairs and tone changes built from the word list |
 | `public/vocab.json` | HSK 3.0 levels 1–6 word list: `[level][i] = [hanzi, pinyin, English]` |
 | `wrangler.jsonc` | Cloudflare Workers config: serves the `public/` folder as a static site |
 | `functions/api/score.js` | Optional: paid detailed scoring through Azure. Not used unless you switch it on. |
@@ -19,8 +20,9 @@ English-language prep site for the HSK and HSKK. A static site: no server, no ru
 ## Features
 
 - **Vocabulary**: all HSK 3.0 levels 1–6, search, mark words as known or add them to a review list.
+- **Shuffle banks** (position remembered per learner): tone trainer (684 single characters, 2,016 two-syllable words), listening (318 questions), HSKK drills (311 prompts), pronunciation (177 similar-sound pairs, 453 tone-change words). Mock tests draw fresh prompts from the HSKK bank.
 - **Tone trainer**: single tones, tone pairs (with tone changes) and “which word did you hear?”, with a list of your most common mix-ups.
-- **Listening practice**: original short dialogues, conversations and passages for HSK 1–6, multiple choice, transcript and English explanations.
+- **Listening practice**: short dialogues, conversations, passages and true-or-false items for HSK 1–6, with transcript and English explanations. Template items compute their answer and explanation, so they are correct by construction.
 - **HSKK mock test**: Beginner / Intermediate / Advanced, with preparation time, prompts played once, automatic recording against a countdown, playback and history.
 - **My progress**: words known per level, accuracy, practice time, day streak and a mistake book. Stored in localStorage and IndexedDB on the learner's device; no account.
 
@@ -57,6 +59,8 @@ pinyin, so polyphonic characters are read the way the word list says.
    (e.g. `{"行": "xing 2"}`), delete that clip from `public/audio/`, and run the workflow again.
 
 When you add new words or sentences, regenerate `tools/texts.json` and run the workflow; only new clips are made.
+
+Word list readings come from the official HSK 3.0 syllabus pinyin (`tools/build_vocab.py`, using the krmanik/HSK-3.0-words-list data, MIT).
 
 ## Optional: detailed AI scoring later
 

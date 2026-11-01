@@ -10,6 +10,24 @@ const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[
 const mmss=s=>`${Math.floor(s/60)}:${String(Math.max(0,s)%60).padStart(2,'0')}`;
 const TONE_SHORT=['light','1st','2nd','3rd','4th'];
 
+/* ---------- shuffle decks: a fixed bank in a shuffled order; the position is remembered in this browser ---------- */
+function seededOrder(n,seed){let a=seed>>>0||1;const r=()=>{a=a+0x6D2B79F5>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296};
+  const o=[...Array(n).keys()];for(let i=n-1;i>0;i--){const j=Math.floor(r()*(i+1));[o[i],o[j]]=[o[j],o[i]]}return o}
+function Deck(key,items){
+  const store='hskDeck:'+key;let st={seed:0,pos:0,n:items.length};
+  try{const v=JSON.parse(localStorage.getItem(store)||'null');if(v&&v.n===items.length)st=v}catch(e){}
+  if(!st.seed)st.seed=1+Math.floor(Math.random()*1e9);
+  let order=seededOrder(items.length,st.seed);
+  const save=()=>{try{localStorage.setItem(store,JSON.stringify(st))}catch(e){}};save();
+  return {items,
+    cur(){return items[order[st.pos%items.length]]},
+    next(){st.pos=(st.pos+1)%items.length;save();return this.cur()},
+    prev(){st.pos=(st.pos-1+items.length)%items.length;save();return this.cur()},
+    shuffle(){st.seed=1+Math.floor(Math.random()*1e9);st.pos=0;order=seededOrder(items.length,st.seed);save();return this.cur()},
+    goTo(item){const i=items.indexOf(item);if(i>=0){st.pos=order.indexOf(i);save()}},
+    label(){return `${(st.pos%items.length)+1} / ${items.length.toLocaleString()}`}};
+}
+
 /* ---------- speech helpers ---------- */
 function voicesZh(){if(!('speechSynthesis' in window))return [];return speechSynthesis.getVoices().filter(v=>/^zh/i.test(v.lang)).sort((a,b)=>(/CN/i.test(b.lang)?1:0)-(/CN/i.test(a.lang)?1:0))}
 function ttsSay(text,{rate=0.85,pitch=1,voice=null}={}){
@@ -49,31 +67,33 @@ function stopAudio(){playToken++;HSKAudio.stopClip();if('speechSynthesis' in win
 /* ================= TONE TRAINER ================= */
 const SINGLE_FALLBACK=[['八','bā'],['拔','bá'],['把','bǎ'],['爸','bà'],['汤','tāng'],['糖','táng'],['躺','tǎng'],['烫','tàng'],['书','shū'],['熟','shú'],['鼠','shǔ'],['树','shù'],['衣','yī'],['姨','yí'],['椅','yǐ'],['意','yì'],['妈','mā'],['麻','má'],['马','mǎ'],['骂','mà']];
 function poolSingle(){
-  const out=[];if(VOCAB)VOCAB.slice(0,2).forEach(l=>l.forEach(w=>{if([...w[0]].length===1&&!w[1].includes(' ')&&toneOf(w[1]))out.push([w[0],w[1],w[2]])}));
-  return out.length>40?out:SINGLE_FALLBACK.map(x=>[x[0],x[1],'']);
-}
-function poolPairs(){
-  const out=[];if(VOCAB)VOCAB.slice(0,3).forEach(l=>l.forEach(w=>{if([...w[0]].length!==2)return;const e=expectedTones(w[1],w[0]);if(e&&e.tones.length===2&&e.tones.every(Boolean))out.push({h:w[0],py:w[1],en:w[2],t:e.tones,spoken:e.syl.map((s,i)=>retone(s,e.tones[i])).join(' ')})}));
+  const out=[];if(VOCAB)VOCAB.slice(0,4).forEach(l=>l.forEach(w=>{if([...w[0]].length===1&&!w[1].includes(' ')&&toneOf(w[1])&&!/^[A-ZĀÁǍÀĒÉĚÈŌÓǑÒ]/.test(w[1]))out.push({h:w[0],py:w[1],en:w[2],t:[toneOf(w[1])],spoken:w[1]})}));
   return out;
 }
-const TT={mode:0,item:null,answered:false,right:0,total:0,streak:0,sel:[0,0]};
+function poolPairs(){
+  const out=[];if(VOCAB)VOCAB.slice(0,4).forEach(l=>l.forEach(w=>{if([...w[0]].length!==2||/^[A-ZĀÁǍÀĒÉĚÈŌÓǑÒ]/.test(w[1]))return;const e=expectedTones(w[1],w[0]);if(e&&e.tones.length===2&&e.tones.every(Boolean))out.push({h:w[0],py:w[1],en:w[2],t:e.tones,spoken:e.syl.map((s,i)=>retone(s,e.tones[i])).join(' ')})}));
+  return out;
+}
+const TT={mode:0,item:null,answered:false,right:0,total:0,streak:0,sel:[0,0],decks:null};
+function ttDecks(){if(TT.decks||!VOCAB)return TT.decks;const s1=poolSingle(),p2=poolPairs();
+  TT.decks=[Deck('tone-single',s1),Deck('tone-pairs',p2),Deck('tone-which',[...s1,...p2])];return TT.decks}
 function ttScore(){
   const el=$('#ttScore');
   el.innerHTML=TT.total?`<b>${TT.right}</b> correct of <b>${TT.total}</b> · ${Math.round(TT.right/TT.total*100)}% · streak <b>${TT.streak}</b>`:'No answers yet this session';
 }
 function ttNew(){
   TT.answered=false;TT.sel=[0,0];$('#ttReveal').innerHTML='';$('#ttNext').hidden=true;
-  if(TT.mode===0){const w=pick(poolSingle());TT.item={h:w[0],py:w[1],en:w[2],t:[toneOf(w[1])],spoken:w[1]};
+  const D=ttDecks();if(!D){$('#ttAsk').textContent='Loading words…';$('#ttPos').textContent='';TT.item=null;return}
+  const dk=D[TT.mode];$('#ttPos').textContent=dk.label();
+  if(TT.mode===0){TT.item=dk.cur();
     $('#ttAsk').textContent='Which tone did you hear?';
     $('#ttChoices').className='choices';
     $('#ttChoices').innerHTML=[1,2,3,4].map(n=>`<button class="choice" type="button" data-t="${n}">${TONE_SHORT[n]}<small>${['','ˉ  high','ˊ  rising','ˇ  dip','ˋ  falling'][n]}</small></button>`).join('')}
-  else if(TT.mode===1){const pool=poolPairs();if(!pool.length){$('#ttAsk').textContent='Loading words…';return}TT.item=pick(pool);
+  else if(TT.mode===1){TT.item=dk.cur();
     $('#ttAsk').textContent='Pick the tone of each syllable, as it is spoken.';
     $('#ttChoices').className='pairgrid';
     $('#ttChoices').innerHTML=[0,1].map(k=>`<div class="pairrow"><span class="note">Syllable ${k+1}</span>${[1,2,3,4].map(n=>`<button class="choice" type="button" data-s="${k}" data-t="${n}">${TONE_SHORT[n]}</button>`).join('')}</div>`).join('')}
-  else{const usePair=Math.random()<0.5;let it;
-    if(usePair){const pool=poolPairs();if(!pool.length){$('#ttAsk').textContent='Loading words…';return}it=pick(pool)}
-    else{const w=pick(poolSingle());it={h:w[0],py:w[1],en:w[2],t:[toneOf(w[1])],spoken:w[1]}}
+  else{const it=dk.cur();
     TT.item=it;const syl=it.spoken.split(' ');const opts=new Set([it.spoken]);let guard=0;
     while(opts.size<4&&guard++<50){const k=rnd(syl.length);const t=1+rnd(4);const v=syl.map((s,i)=>i===k?retone(s,t):s).join(' ');opts.add(v)}
     TT.opts=shuffle([...opts]);
@@ -92,7 +112,8 @@ function ttFinish(ok,gotTones){
 function initTones(){
   seg($('#ttMode'),['Single tones','Tone pairs','Which word?'],i=>{TT.mode=i;ttNew()},0);
   $('#ttPlay').onclick=ttPlay;
-  $('#ttNext').onclick=()=>{ttNew();ttPlay()};
+  $('#ttNext').onclick=()=>{const D=ttDecks();if(D)D[TT.mode].next();ttNew();ttPlay()};
+  $('#ttShuf').onclick=()=>{const D=ttDecks();if(D)D[TT.mode].shuffle();ttNew()};
   $('#ttChoices').addEventListener('click',e=>{const b=e.target.closest('.choice');if(!b||TT.answered||!TT.item)return;
     if(TT.mode===0){const g=+b.dataset.t,ok=g===TT.item.t[0];b.classList.add(ok?'right':'wrong');if(!ok)$(`#ttChoices .choice[data-t="${TT.item.t[0]}"]`).classList.add('right');ttFinish(ok,[g])}
     else if(TT.mode===1){const s=+b.dataset.s,g=+b.dataset.t;TT.sel[s]=g;
@@ -159,13 +180,14 @@ const LISTEN=[
  {lvl:6,type:'Short dialogue',lines:[['W','你这个计划听起来不错，但执行起来恐怕没那么简单。'],['M','我知道困难不少，可总不能因为怕失败就什么都不做吧。']],qs:[{q:'男的是什么态度？',qEn:'What is the man’s attitude?',opts:['打算放弃','愿意尝试','非常担心','觉得计划很简单'],en:['plans to give up','willing to try','very worried','thinks it is easy'],ans:1,why:'总不能因为怕失败就什么都不做吧: you can’t do nothing out of fear of failing.'}]},
  {lvl:6,type:'Short dialogue',lines:[['M','小王做事一向雷厉风行，交给他的任务从来不拖。'],['W','难怪领导这么器重他。']],qs:[{q:'关于小王，可以知道什么？',qEn:'What do we learn about Xiao Wang?',opts:['做事很慢','做事果断、效率高','经常请假','不受领导重视'],en:['slow worker','decisive and efficient','often takes leave','not valued by the boss'],ans:1,why:'雷厉风行 means acting swiftly and decisively; 器重 means the boss values him highly.'}]}
 ];
-LISTEN.forEach((it,i)=>{it.id='L'+i});
-const LS={lvl:1,idx:0,plays:0,showT:false,answers:{}};
-function lsItems(){return LISTEN.filter(x=>x.lvl===LS.lvl)}
+LISTEN.push(...(window.HSK_BANKS?HSK_BANKS.listening:[]));
+LISTEN.forEach(it=>{it.id='L'+HSKAudio.fnv(it.lines.map(l=>l[1]).join('|')+'|'+it.qs[0].q).slice(0,10)});
+const LS={lvl:1,plays:0,showT:false,answers:{},decks:{}};
+function lsDeck(){return LS.decks[LS.lvl]||(LS.decks[LS.lvl]=Deck('listen-'+LS.lvl,LISTEN.filter(x=>x.lvl===LS.lvl)))}
 function lsRender(){
-  stopAudio();const items=lsItems(),it=items[LS.idx];LS.plays=0;LS.showT=false;
+  stopAudio();const dk=lsDeck(),it=dk.cur();LS.plays=0;LS.showT=false;$('#lsPos').textContent=dk.label();
   const wrongMark=id=>H.data.listen.wrong[id]?' <span class="chip warn-chip">in your mistake book</span>':'';
-  $('#lsHead').innerHTML=`<span class="eyebrow">HSK ${it.lvl} · ${esc(it.type)} · ${LS.idx+1} of ${items.length}</span>${wrongMark(it.id)}`;
+  $('#lsHead').innerHTML=`<span class="eyebrow">HSK ${it.lvl} · ${esc(it.type)}</span>${wrongMark(it.id)}`;
   $('#lsPlays').textContent='';
   $('#lsTranscript').hidden=true;
   $('#lsTranscript').innerHTML=it.lines.map(([w,t])=>`<p><b>${w==='W'?'Woman':w==='M'?'Man':'Speaker'}:</b> <span class="han">${esc(t)}</span></p>`).join('');
@@ -175,7 +197,6 @@ function lsRender(){
       <div class="lopts">${q.opts.map((o,oi)=>`<button class="choice lopt" type="button" data-oi="${oi}"><span class="letter">${'ABCD'[oi]}</span><span class="han">${esc(o)}</span></button>`).join('')}</div>
       <p class="lwhy" hidden></p></div>`).join('');
   const done=LS.answers[it.id];if(done)done.forEach((oi,qi)=>{if(oi!=null)lsMark(it,qi,oi,false)});
-  $('#lsPrev').disabled=LS.idx===0;$('#lsNext').textContent=LS.idx===items.length-1?'Back to first':'Next question';
 }
 function lsMark(it,qi,oi,record){
   const q=it.qs[qi],box=$(`#lsQs .lq[data-qi="${qi}"]`);const ok=oi===q.ans;
@@ -188,23 +209,24 @@ function lsMark(it,qi,oi,record){
     if(all){$('#lsTranscript').hidden=false;$('#lsTBtn').textContent='Hide transcript'}}
 }
 async function lsPlay(){
-  const it=lsItems()[LS.idx];LS.plays++;$('#lsPlays').textContent=`Played ${LS.plays}×${LS.plays>2?' · the real exam plays most items once or twice':''}`;
+  const it=lsDeck().cur();LS.plays++;$('#lsPlays').textContent=`Played ${LS.plays}×${LS.plays>2?' · the real exam plays most items once or twice':''}`;
   $('#lsPlay').disabled=true;$('#lsPlay').textContent='Playing…';
-  const lines=[...it.lines,...it.qs.map(q=>['Q','问：'+q.q])];
+  const lines=[...it.lines,...it.qs.filter(q=>q.read!==false).map(q=>['Q','问：'+q.q])];
   await sayLines(lines,it.lvl<=2?0.75:it.lvl<=4?0.85:0.92);
   $('#lsPlay').disabled=false;$('#lsPlay').textContent='▶ Play again';
 }
 function initListening(){
-  seg($('#lsSeg'),[1,2,3,4,5,6].map(n=>'HSK '+n),i=>{LS.lvl=i+1;LS.idx=0;lsRender();$('#lsPlay').textContent='▶ Play audio'},0);
+  seg($('#lsSeg'),[1,2,3,4,5,6].map(n=>'HSK '+n),i=>{LS.lvl=i+1;lsRender();$('#lsPlay').textContent='▶ Play audio'},0);
   $('#lsPlay').onclick=lsPlay;
   $('#lsTBtn').onclick=()=>{const t=$('#lsTranscript');t.hidden=!t.hidden;$('#lsTBtn').textContent=t.hidden?'Show transcript':'Hide transcript'};
-  $('#lsPrev').onclick=()=>{if(LS.idx>0){LS.idx--;lsRender();$('#lsPlay').textContent='▶ Play audio'}};
-  $('#lsNext').onclick=()=>{const n=lsItems().length;LS.idx=(LS.idx+1)%n;lsRender();$('#lsPlay').textContent='▶ Play audio'};
-  $('#lsQs').addEventListener('click',e=>{const b=e.target.closest('.lopt');if(!b||b.disabled)return;const it=lsItems()[LS.idx];
+  $('#lsPrev').onclick=()=>{lsDeck().prev();lsRender();$('#lsPlay').textContent='▶ Play audio'};
+  $('#lsNext').onclick=()=>{lsDeck().next();lsRender();$('#lsPlay').textContent='▶ Play audio'};
+  $('#lsShuf').onclick=()=>{lsDeck().shuffle();LS.answers={};lsRender();$('#lsPlay').textContent='▶ Play audio'};
+  $('#lsQs').addEventListener('click',e=>{const b=e.target.closest('.lopt');if(!b||b.disabled)return;const it=lsDeck().cur();
     const qi=+b.closest('.lq').dataset.qi;lsMark(it,qi,+b.dataset.oi,true)});
   lsRender();
 }
-function openListening(id){const it=LISTEN.find(x=>x.id===id);if(!it)return;LS.lvl=it.lvl;LS.idx=lsItems().indexOf(it);delete LS.answers[id];
+function openListening(id){const it=LISTEN.find(x=>x.id===id);if(!it)return;LS.lvl=it.lvl;lsDeck().goTo(it);delete LS.answers[id];
   $('#lsSeg').querySelectorAll('button').forEach((b,i)=>b.setAttribute('aria-pressed',i===it.lvl-1));lsRender();$('#listening').scrollIntoView({behavior:'smooth'})}
 
 /* ================= VOCAB: known / review ================= */
@@ -298,6 +320,13 @@ const MOCK=[
    {title:'Part 3 · Answer questions',how:'Read the question and talk for up to 2.5 minutes.',mode:'talk',sec:150,items:[
      ['你认为科技让人与人之间的关系更近了还是更远了？','Has technology brought people closer or pushed them apart?'],['有人说“失败是成功之母”，你怎么看？','“Failure is the mother of success.” Do you agree?']]}]}
 ];
+const MOCK_COUNTS={Beginner:[15,10,2],Intermediate:[10,2,2],Advanced:[3,1,2]};
+function drawMock(i){
+  // copy the level's structure and fill each part with fresh prompts from the HSKK bank
+  const L=MOCK[i],bank=window.HSK_BANKS?HSK_BANKS.speaking:[];
+  return Object.assign({},L,{parts:L.parts.map((p,pi)=>{const pool=bank.filter(x=>x.lvl===L.name&&x.mode===p.mode);const n=MOCK_COUNTS[L.name][pi];
+    return Object.assign({},p,{items:pool.length>=n?shuffle(pool).slice(0,n).map(x=>[x.text,x.en]):p.items})})});
+}
 const MX={lvl:1,steps:[],i:0,stream:null,rec:null,chunks:[],clips:[],timer:null,left:0,running:false,id:null,started:0};
 function buildSteps(L){
   const steps=[];
@@ -314,7 +343,7 @@ function mxCountdown(sec,onTick,onDone){mxClear();MX.left=sec;onTick(MX.left);MX
 function mxProgress(){const items=MX.steps.filter(s=>s.kind==='item'),cur=MX.steps.slice(0,MX.i+1).filter(s=>s.kind==='item').length;
   $('#mxBar').style.width=(cur/items.length*100)+'%';$('#mxPos').textContent=`${cur} / ${items.length} answers`}
 async function mxStart(){
-  const L=MOCK[MX.lvl];MX.steps=buildSteps(L);MX.i=0;MX.clips=[];MX.id='M'+Date.now();MX.started=Date.now();MX.running=true;
+  const L=drawMock(MX.lvl);MX.L=L;MX.steps=buildSteps(L);MX.i=0;MX.clips=[];MX.id='M'+Date.now();MX.started=Date.now();MX.running=true;
   $('#mxSetup').hidden=true;$('#mxRun').hidden=false;$('#mxReview').hidden=true;
   try{if(navigator.mediaDevices&&window.MediaRecorder)MX.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}})}catch(e){MX.stream=null}
   $('#mxMic').textContent=MX.stream?'● Microphone on':'Microphone unavailable: answers will not be recorded';
@@ -389,8 +418,8 @@ async function reviewPast(id){const m=H.data.mock.find(x=>x.id===id);if(!m)retur
   $('#mxSetup').hidden=true;$('#mxRun').hidden=true;showReview(m,blobs)}
 function initMock(){
   seg($('#mxSeg'),MOCK.map(m=>'HSKK '+m.name),i=>{MX.lvl=i;mxInfo()},1);
-  function mxInfo(){const L=MOCK[MX.lvl];const n=L.parts.reduce((a,p)=>a+p.items.length,0);
-    $('#mxInfo').innerHTML=`<b>${esc(L.for)}</b> · ${n} answers · ${mmss(L.prep)} preparation time<br>${L.parts.map(p=>`${esc(p.title)} <span class="note">(${p.items.length} × up to ${mmss(p.sec)})</span>`).join('<br>')}`}
+  function mxInfo(){const L=MOCK[MX.lvl];const c=MOCK_COUNTS[L.name];const n=c.reduce((a,b)=>a+b,0);const pool=(window.HSK_BANKS?HSK_BANKS.speaking:[]).filter(x=>x.lvl===L.name).length;
+    $('#mxInfo').innerHTML=`<b>${esc(L.for)}</b> · ${n} answers · ${mmss(L.prep)} preparation time · drawn from ${pool} prompts<br>${L.parts.map((p,i)=>`${esc(p.title)} <span class="note">(${c[i]} × up to ${mmss(p.sec)})</span>`).join('<br>')}`}
   mxInfo();
   $('#mxStart').onclick=mxStart;
   $('#mxQuit').onclick=()=>{mxStop();$('#mxRun').hidden=true;$('#mxSetup').hidden=false};
@@ -408,12 +437,98 @@ async function idbPrune(){const keep=new Set(H.data.mock.map(m=>m.id));const db=
   await new Promise(res=>{const tx=db.transaction('audio','readwrite');const st=tx.objectStore('audio');const rq=st.openKeyCursor();
     rq.onsuccess=()=>{const c=rq.result;if(!c)return;if(!keep.has(String(c.key).split(':')[0]))st.delete(c.key);c.continue()};tx.oncomplete=res;tx.onerror=res})}
 
+
+/* ================= HSKK TASK DRILLS (bank) ================= */
+const SP_MODES={Beginner:[['repeat','Listen & repeat'],['answer','Listen & answer'],['talk','Answer questions']],
+  Intermediate:[['repeat','Listen & repeat'],['picture','Describe a picture'],['talk','Answer questions']],
+  Advanced:[['retell','Listen & retell'],['read','Read aloud'],['talk','Answer questions']]};
+const SP_SEC={repeat:0,answer:15,picture:120,read:120,retell:120,talk:{Beginner:90,Intermediate:120,Advanced:150}};
+const SP={lvl:'Beginner',mode:'repeat',decks:{},shown:false,tid:null,left:0};
+function spDeck(){const k=SP.lvl+'/'+SP.mode;return SP.decks[k]||(SP.decks[k]=Deck('speak-'+k,(window.HSK_BANKS?HSK_BANKS.speaking:[]).filter(x=>x.lvl===SP.lvl&&x.mode===SP.mode)))}
+function spSecs(){const v=SP_SEC[SP.mode];return typeof v==='object'?v[SP.lvl]:v}
+function spStopTimer(){clearInterval(SP.tid);SP.tid=null}
+function spRender(){
+  spStopTimer();stopAudio();const dk=spDeck(),it=dk.cur();if(!it)return;
+  const audio=['repeat','answer','retell'].includes(SP.mode);SP.shown=!audio;
+  $('#spPos').textContent=dk.label();
+  $('#spHead').textContent=`HSKK ${SP.lvl} · ${SP_MODES[SP.lvl].find(m=>m[0]===SP.mode)[1]}`;
+  const t=$('#spText');t.textContent=it.text;t.classList.toggle('masked',audio);t.classList.toggle('readtext',SP.mode==='read'||SP.mode==='retell');
+  $('#spEn').textContent=it.en;$('#spEn').hidden=audio;
+  $('#spShow').hidden=!audio;$('#spShow').textContent='Show text';
+  $('#spPlay').textContent=audio?'▶ Play prompt':SP.mode==='read'?'▶ Hear a model reading':'▶ Hear the question';
+  const secs=spSecs();$('#spTimerRow').hidden=!secs;$('#spTime').hidden=!secs;
+  if(secs){$('#spTimer').textContent=mmss(secs);$('#spTimer').classList.remove('low');$('#spPhase').textContent='ready';$('#spTime').textContent='Start speaking'}
+  $('#spRec').hidden=!(SP.mode==='repeat'||SP.mode==='read'||SP.mode==='retell');
+}
+function initSpeaking(){
+  const lv=Object.keys(SP_MODES);
+  const modeSeg=()=>{const el=$('#spMode');const ms=SP_MODES[SP.lvl];const fresh=el.cloneNode(false);el.replaceWith(fresh);seg(fresh,ms.map(m=>m[1]),i=>{SP.mode=ms[i][0];spRender()},0);SP.mode=ms[0][0]};
+  seg($('#spLvl'),lv.map(x=>'HSKK '+x),i=>{SP.lvl=lv[i];modeSeg();spRender()},0);
+  modeSeg();
+  $('#spPlay').onclick=()=>{const it=spDeck().cur();sayLines([['W',it.text]],SP.mode==='retell'?0.88:0.82)};
+  $('#spShow').onclick=()=>{SP.shown=!SP.shown;$('#spText').classList.toggle('masked',!SP.shown);$('#spEn').hidden=!SP.shown;$('#spShow').textContent=SP.shown?'Hide text':'Show text'};
+  $('#spRec').onclick=()=>{const it=spDeck().cur();openPractice(it.text,'',it.en)};
+  $('#spTime').onclick=()=>{
+    if(SP.tid){spStopTimer();$('#spTime').textContent='Resume';$('#spPhase').textContent='paused';return}
+    if(!SP.left||SP.left<=0)SP.left=spSecs();$('#spTime').textContent='Pause';$('#spPhase').textContent='speaking';
+    SP.tid=setInterval(()=>{SP.left--;$('#spTimer').textContent=mmss(Math.max(SP.left,0));$('#spTimer').classList.toggle('low',SP.left<=15);
+      if(SP.left<=0){spStopTimer();SP.left=0;$('#spPhase').textContent='time is up';$('#spTime').textContent='Start again'}},1000)};
+  $('#spPrev').onclick=()=>{spDeck().prev();SP.left=0;spRender()};
+  $('#spNext').onclick=()=>{spDeck().next();SP.left=0;spRender()};
+  $('#spShuf').onclick=()=>{spDeck().shuffle();SP.left=0;spRender()};
+  spRender();
+}
+
+/* ================= PRONUNCIATION DRILL (bank from the word list) ================= */
+const PR={mode:0,decks:null,item:null,target:null,answered:false,opts:null};
+function prDecks(){if(PR.decks||!VOCAB||!window.HSK_BANKS)return PR.decks;const P=HSK_BANKS.buildPron(VOCAB);PR.decks=[Deck('pron-pairs',P.pairs),Deck('pron-tones',P.sandhi)];return PR.decks}
+function prRender(){
+  PR.answered=false;$('#prReveal').innerHTML='';$('#prRec').hidden=true;
+  const D=prDecks();if(!D){$('#prAsk').textContent='Loading words…';return}
+  const dk=D[PR.mode],it=dk.cur();PR.item=it;$('#prPos').textContent=dk.label();
+  if(PR.mode===0){
+    PR.target=Math.random()<0.5?'a':'b';
+    $('#prHead').textContent=it.label.split(':')[0];
+    $('#prAsk').textContent='Play, then choose the word you heard.';
+    $('#prChoices').innerHTML=['a','b'].map(k=>`<button class="choice" type="button" data-k="${k}"><span class="han">${esc(it[k][0])}</span><span class="pyl">${colorPinyin(esc(it[k][1]))}</span></button>`).join('');
+  }else{
+    $('#prHead').textContent=it.kind==='neutral'?'Neutral tone':'Tone change';
+    $('#prAsk').innerHTML=`How is <span class="han" style="font-size:1.3rem">${esc(it.h)}</span> <span class="note">(${esc(it.en)})</span> actually said? Choose, then play to check.`;
+    const syl=it.spoken.split(' ');const opts=new Set([it.spoken]);
+    if(it.kind==='sandhi')opts.add(it.py);
+    let g=0;while(opts.size<3&&g++<40){const k=it.kind==='neutral'?it.dict.findIndex(t=>t===0):Math.floor(Math.random()*syl.length);const t=1+Math.floor(Math.random()*4);if(k<0)break;opts.add(syl.map((s2,i)=>i===k?retone(s2,t):s2).join(' '))}
+    PR.opts=shuffle([...opts]);
+    $('#prChoices').innerHTML=PR.opts.map((o,i)=>`<button class="choice" type="button" data-o="${i}"><span class="py-choice">${colorPinyin(esc(o))}</span></button>`).join('');
+  }
+}
+function prPlay(){const it=PR.item;if(!it)return;if(PR.mode===0)say(it[PR.target][0],{rate:0.6});else say(it.h,{rate:0.7})}
+function initPron(){
+  seg($('#prMode'),['Similar sounds','Tone changes'],i=>{PR.mode=i;prRender()},0);
+  $('#prPlay').onclick=prPlay;
+  $('#prNext').onclick=()=>{const D=prDecks();if(D)D[PR.mode].next();prRender();if(PR.mode===0)prPlay()};
+  $('#prShuf').onclick=()=>{const D=prDecks();if(D)D[PR.mode].shuffle();prRender()};
+  $('#prRec').onclick=()=>{const it=PR.item;if(!it)return;if(PR.mode===0){const w=it[PR.target];openPractice(w[0],w[1],w[2])}else openPractice(it.h,it.py,it.en)};
+  $('#prChoices').addEventListener('click',e=>{const b=e.target.closest('.choice');if(!b||!PR.item)return;const it=PR.item;
+    if(PR.answered){if(PR.mode===0)say(it[b.dataset.k][0],{rate:0.6});return}   // after answering, tap either word to compare
+    PR.answered=true;
+    if(PR.mode===0){const ok=b.dataset.k===PR.target;b.classList.add(ok?'right':'wrong');if(!ok)$(`#prChoices .choice[data-k="${PR.target}"]`).classList.add('right');
+      const w=it[PR.target],o=it[PR.target==='a'?'b':'a'];
+      $('#prReveal').innerHTML=`<span class="verdict ${ok?'good':'bad'}">${ok?'Correct':'Not quite'}</span> You heard <span class="han">${esc(w[0])}</span> ${colorPinyin(esc(w[1]))} <span class="note">${esc(w[2])}</span>, not <span class="han">${esc(o[0])}</span> ${colorPinyin(esc(o[1]))}. <span class="note">${esc(it.label.split(':').slice(1).join(':').trim()||'')} Tap each word to compare.</span>`;
+    }else{const o=PR.opts[+b.dataset.o],ok=o===it.spoken;b.classList.add(ok?'right':'wrong');
+      if(!ok)$('#prChoices').querySelectorAll('.choice').forEach(x=>{if(PR.opts[+x.dataset.o]===it.spoken)x.classList.add('right')});
+      $('#prReveal').innerHTML=`<span class="verdict ${ok?'good':'bad'}">${ok?'Correct':'Not quite'}</span> <span class="han">${esc(it.h)}</span> is said ${colorPinyin(esc(it.spoken))}${it.spoken!==it.py?` <span class="note">(written ${esc(it.py)})</span>`:''}. ${esc(it.rule)}`;
+      say(it.h,{rate:0.7})}
+    $('#prRec').hidden=false;
+  });
+  prRender();
+}
+
 /* ---------- boot ---------- */
 function boot(){
-  initTones();initListening();initVocabMarks();initProgress();initMock();
+  initTones();initListening();initSpeaking();initPron();initVocabMarks();initProgress();initMock();
   // the word list loads asynchronously: refresh things that depend on it
-  const wait=setInterval(()=>{if(VOCAB){clearInterval(wait);renderProgress();markCards();if(TT.mode!==0&&!TT.item)ttNew()}},300);
+  const wait=setInterval(()=>{if(VOCAB){clearInterval(wait);renderProgress();markCards();ttNew();prRender()}},300);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
-window.HSK_FEATURES={openListening,LISTEN,MOCK,SINGLE_FALLBACK};
+window.HSK_FEATURES={openListening,LISTEN,MOCK,MOCK_COUNTS,SINGLE_FALLBACK};
 })();
