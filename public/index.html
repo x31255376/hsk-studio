@@ -146,6 +146,66 @@ th{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut
 .chars .mid{border-color:var(--t3);color:var(--t3)}
 .chars .bad{border-color:var(--cinnabar);color:var(--cinnabar)}
 
+/* tone trainer */
+.choice small{display:block;font-size:.72rem;font-weight:500;color:var(--muted);margin-top:2px}
+.py-choice{font-size:1.15rem}
+.pairgrid{display:grid;gap:8px}
+.pairrow{display:grid;grid-template-columns:auto repeat(4,minmax(0,1fr));gap:8px;align-items:center}
+.pairrow .note{min-width:76px}
+.choice.picked{border-color:var(--ink)}
+.verdict{font-weight:700}.verdict.good{color:var(--jade)}.verdict.bad{color:var(--cinnabar)}
+.warn-chip{background:transparent;border:1px solid var(--t3);color:var(--t3)}
+#ttConf{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.score b{color:var(--ink)}
+/* listening */
+.lpanel{display:grid;gap:14px}
+.transcript{border-left:3px solid var(--line);padding-left:12px;display:grid;gap:6px}
+.transcript p{margin:0}
+.transcript .han{font-size:1.1rem}
+.lq{display:grid;gap:10px;padding-block:6px}
+.lq-q{margin:0}.lq-q .han{font-size:1.2rem}
+.lopts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
+.lopt{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;text-align:left;align-items:center}
+.lopt .han{font-size:1.1rem;font-weight:500}
+.lopt .letter{font-family:var(--display);font-size:1.1rem;color:var(--muted)}
+.lopt .opt-en{grid-column:2;font-weight:400}
+.lopt:disabled{cursor:default}
+.lwhy{margin:0;font-size:.95rem}
+/* vocab marks */
+.card.known{border-color:var(--jade)}
+.card.known::after{content:"✓ known";font-size:.7rem;color:var(--jade);font-weight:600}
+.card.review::after{content:"★ review";font-size:.7rem;color:var(--t3);font-weight:600}
+.btn.on{background:var(--jade-soft)}
+select.search{appearance:auto}
+/* mock */
+.mx-run{display:grid;gap:14px}
+.mx-top{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.mx-stage{display:grid;gap:12px;min-height:220px;align-content:start}
+.mx-listen{font-size:1.2rem}
+.readtext{font-size:1.2rem;line-height:2}
+.rec-on{color:var(--cinnabar)}
+.prep-list{display:grid;gap:6px;margin:0;padding-left:1.2em}
+.btn.small{padding:6px 12px;font-size:.88rem}
+.hist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.hist li{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-block:8px}
+.rv{display:grid;gap:14px;padding-left:1.2em}
+.rv-text{font-size:1.15rem}
+.rv audio{height:36px;max-width:100%}
+/* progress */
+.pg-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:560px){.pg-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pg-tiles .sc small{font-size:.75rem;letter-spacing:0;text-transform:none}
+.pg-levels{display:grid;gap:8px;margin-top:10px}
+.lvbar{display:grid;grid-template-columns:52px minmax(0,1fr) 84px;gap:10px;align-items:center}
+.num{font-variant-numeric:tabular-nums;text-align:right}
+.mb{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.mb .panel{display:grid;gap:10px;align-content:start}
+.chipwrap{display:flex;flex-wrap:wrap;gap:6px}
+.word-chip{font-size:1.1rem;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;padding:4px 10px}
+.mb-list{display:grid;gap:6px}
+.mb-item{display:flex;gap:8px;align-items:center;flex-wrap:wrap;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;color:var(--ink)}
+.mb-tones{margin:0;padding-left:1.2em;display:grid;gap:6px;font-size:.95rem}
+
 footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
@@ -162,7 +222,7 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
 </header>
 
 <nav aria-label="Sections"><div class="wrap">
-  <a href="#levels">Levels</a><a href="#vocab">Vocabulary</a><a href="#tones">Tones</a><a href="#hskk">HSKK speaking</a><a href="#pron">Pronunciation</a>
+  <a href="#levels">Levels</a><a href="#vocab">Vocabulary</a><a href="#tones">Tones</a><a href="#listening">Listening</a><a href="#hskk">HSKK speaking</a><a href="#mock">Mock test</a><a href="#progress">My progress</a><a href="#pron">Pronunciation</a>
 </div></nav>
 
 <main class="wrap">
@@ -216,21 +276,73 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
     <p class="lede">Tones decide your HSKK pronunciation score and how well you catch HSK listening questions. Tap a card to hear it.</p>
     <div class="tones" id="toneCards"></div>
     <div class="panel quiz">
-      <div class="quiz-top"><h3>Tone ear-training</h3><span class="score" id="quizScore">0 / 0</span></div>
-      <div class="toolbar"><button class="btn" id="quizPlay" type="button">▶ Play syllable</button><button class="btn ghost" id="quizNext" type="button">Next</button></div>
-      <div class="choices" id="quizChoices"></div>
-      <div class="reveal" id="quizReveal"></div>
+      <div class="quiz-top"><h3>Tone trainer</h3><span class="score" id="ttScore"></span></div>
+      <div class="seg" id="ttMode" role="group" aria-label="Training mode"></div>
+      <p class="note" id="ttAsk"></p>
+      <div class="toolbar"><button class="btn" id="ttPlay" type="button">▶ Play</button><button class="btn ghost" id="ttNext" type="button" hidden>Next</button></div>
+      <div class="choices" id="ttChoices"></div>
+      <div class="reveal" id="ttReveal"></div>
+      <div id="ttConf"></div>
     </div>
     <p class="warn" id="ttsWarn" hidden>Your browser has no Chinese voice installed, so audio may sound wrong or silent. On iPhone, add a Chinese voice in Settings › Accessibility › Spoken Content.</p>
   </section>
 
+  <section id="listening">
+    <div class="eyebrow">Listening · the largest part of the HSK</div>
+    <h2>Listening practice</h2>
+    <p class="lede">Short and long dialogues in the style of each level. Play the audio, choose an answer, then read the transcript and the explanation. Try answering before you look at the transcript.</p>
+    <div class="seg" id="lsSeg" role="group" aria-label="Listening level"></div>
+    <div class="panel lpanel">
+      <div id="lsHead"></div>
+      <div class="toolbar"><button class="btn" id="lsPlay" type="button">▶ Play audio</button><button class="btn ghost" id="lsTBtn" type="button">Show transcript</button><span class="note" id="lsPlays"></span></div>
+      <div class="transcript" id="lsTranscript" hidden></div>
+      <div id="lsQs"></div>
+      <div class="toolbar"><button class="btn ghost" id="lsPrev" type="button">Previous</button><button class="btn ghost" id="lsNext" type="button">Next question</button></div>
+    </div>
+  </section>
+
   <section id="hskk">
     <div class="eyebrow">Speaking test</div>
-    <h2>HSKK mock tasks</h2>
-    <p class="lede">The HSKK is recorded: you hear or read a prompt and speak into a microphone. Each level is scored out of 100 and you pass with 60. Run each task below with the built-in timers, and record yourself on your phone to review.</p>
+    <h2>HSKK task drills</h2>
+    <p class="lede">The HSKK is recorded: you hear or read a prompt and speak into a microphone. Each level is scored out of 100 and you pass with 60. Drill each task type below at your own pace, then take the full mock test further down.</p>
     <div class="seg" id="kkSeg" role="group" aria-label="HSKK level"></div>
     <p class="note" id="kkInfo"></p>
     <div class="tasks" id="tasks"></div>
+  </section>
+
+  <section id="mock">
+    <div class="eyebrow">Exam simulation</div>
+    <h2>HSKK mock test</h2>
+    <p class="lede">Runs like the real speaking test: preparation time, prompts played once, answers recorded automatically against a countdown. Afterwards you can play back every answer. Recordings stay in this browser.</p>
+    <div id="mxSetup" class="panel" style="display:grid;gap:14px">
+      <div class="seg" id="mxSeg" role="group" aria-label="Mock test level"></div>
+      <p id="mxInfo" class="note"></p>
+      <p class="note">Use headphones if you can, so the recording does not pick up the prompt. Your browser will ask for the microphone.</p>
+      <div class="toolbar"><button class="btn rec" id="mxStart" type="button">Start mock test</button></div>
+    </div>
+    <div id="mxRun" class="panel mx-run" hidden>
+      <div class="mx-top"><span class="chip" id="mxMic"></span><span class="note num" id="mxPos"></span><button class="btn ghost small" id="mxQuit" type="button">Quit</button></div>
+      <div class="vbar"><span id="mxBar"></span></div>
+      <div id="mxStage" class="mx-stage"></div>
+    </div>
+    <div id="mxReview" class="panel" hidden></div>
+    <h3>Past mock tests</h3>
+    <ul class="hist" id="mxHist"></ul>
+  </section>
+
+  <section id="progress">
+    <div class="eyebrow">Saved in this browser</div>
+    <h2>My progress</h2>
+    <p class="lede">Your words, scores and practice time are kept on this device only, with no account needed. Clearing your browser data removes them.</p>
+    <div class="scores pg-tiles" id="pgTiles"></div>
+    <div class="panel"><h3>Words known by level</h3><div id="pgLevels" class="pg-levels"></div></div>
+    <div class="mb">
+      <div class="panel"><h3>Words to review</h3><div id="mbWords" class="chipwrap"></div></div>
+      <div class="panel"><h3>Listening mistakes</h3><div id="mbListen" class="mb-list"></div></div>
+      <div class="panel"><h3>Tone mix-ups</h3><ul id="mbTones" class="mb-tones"></ul></div>
+    </div>
+    <div class="toolbar"><button class="btn ghost small" id="pgReset" type="button">Reset my progress</button>
+      <span id="pgConfirm" hidden><span class="warn">Delete all saved progress and recordings?</span> <button class="btn small rec" id="pgYes" type="button">Delete</button> <button class="btn ghost small" id="pgNo" type="button">Cancel</button></span></div>
   </section>
 
   <section id="pron">
@@ -269,6 +381,7 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
   </div>
 </div>
 
+<script src="progress.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const TONE_COLORS=['var(--t1)','var(--t2)','var(--t3)','var(--t4)'];
@@ -321,6 +434,8 @@ function currentList(){
   let list=[];lv.forEach(i=>VOCAB[i].forEach((w,k)=>list.push([w[0],w[1],w[2],i+1])));
   if(query){const q=query.trim().toLowerCase(),qp=plain(q);
     list=list.filter(w=>w[0].includes(q)||plain(w[1]).startsWith(qp)||plain(w[1]).includes(qp)&&qp.length>2||w[2].toLowerCase().includes(q))}
+  const f=window.HSK_FILTER,P=window.HSKP;
+  if(P&&f&&f!=='all')list=list.filter(w=>f==='known'?P.isKnown(w[0]):f==='review'?P.isReview(w[0]):!P.isKnown(w[0]));
   return list;
 }
 function rebuild(){if(!VOCAB)return;order=currentList();shown=0;$('#cards').innerHTML='';renderMore()}
@@ -330,7 +445,7 @@ function renderMore(){
   $('#cards').insertAdjacentHTML('beforeend',next.map((w,i)=>cardHtml(w,shown+i)).join(''));
   shown+=next.length;
   const scope=(vl===0||query.trim())?'HSK 1–6':`HSK ${vl}`;
-  $('#vocabCount').textContent=order.length?`${order.length.toLocaleString()} words in ${scope}${query?` matching “${query}”`:''} · showing ${shown.toLocaleString()}`:`No words in ${scope} match “${query}”.`;
+  $('#vocabCount').textContent=order.length?`${order.length.toLocaleString()} word${order.length===1?'':'s'} in ${scope}${query?` matching “${query}”`:''} · showing ${shown.toLocaleString()}`:`No words in ${scope} match “${query}”.`;
   $('#more').hidden=shown>=order.length;
 }
 $('#more').onclick=renderMore;
@@ -519,6 +634,7 @@ function showResult(tr,azure,pcm){
       return {ch:[...pText][i],py:exp.syl[i],want,got,ok,curve:s.curve}});
     if(count){tiles.push([Math.round(match/count*100),'Tones']);}
     charsHtml=rows.map(r=>`<span class="${!r.want?'':r.ok?'ok':'bad'}" style="display:grid;justify-items:center;gap:2px;padding:6px 8px"><span style="border:0;padding:0;font-size:1.4rem">${escapeHtml(r.ch)}</span>${curveSVG(r.curve,r.want,r.got)}<small style="font-family:var(--body);font-size:.72rem">${r.want?`${r.ok?'✓':'✗'} you: ${r.got||'?'} · want: ${r.want}`:'light tone'}</small></span>`).join('');
+    if(window.HSKP)HSKP.recordPron(rows);
     const wrong=rows.filter(r=>r.want&&!r.ok);
     notes.push(wrong.length?wrong.map(r=>`${r.ch} (${r.want!==toneOf(r.py)?retone(r.py,r.want)+', a tone change from '+r.py:r.py}) should be ${TONE_NAMES[r.want]}, it sounded ${TONE_NAMES[r.got]||'unclear'}.`).join(' '):'Every tone matched. Try it again a little faster.');
     if(loadBaseline().length<3)notes.push('Tone detection gets more accurate after a few recordings, as it learns your voice range.');
@@ -569,18 +685,6 @@ function contourSVG(t){
 }
 $('#toneCards').innerHTML=TONES.map(t=>`<button class="tone" type="button" data-say="${t.ex}"><span class="lbl">${t.name} · ${t.contour}</span>${contourSVG(t)}<span><span class="ch">${t.ex}</span> ${t.py}</span></button>`).join('');
 $('#toneCards').addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(b)speak(b.dataset.say,0.6)});
-const QSYL=[['八','bā',1,'eight'],['拔','bá',2,'pull out'],['把','bǎ',3,'hold'],['爸','bà',4,'dad'],['汤','tāng',1,'soup'],['糖','táng',2,'sugar'],['躺','tǎng',3,'lie down'],['烫','tàng',4,'scalding'],['书','shū',1,'book'],['熟','shú',2,'ripe'],['鼠','shǔ',3,'mouse'],['树','shù',4,'tree'],['衣','yī',1,'clothing'],['姨','yí',2,'aunt'],['椅','yǐ',3,'chair'],['意','yì',4,'meaning'],['居','jū',1,'reside'],['局','jú',2,'bureau'],['举','jǔ',3,'lift'],['句','jù',4,'sentence']];
-let qi=null,answered=false,right=0,total=0;
-function nextQuiz(){qi=QSYL[Math.floor(Math.random()*QSYL.length)];answered=false;$('#quizReveal').textContent='';
-  $('#quizChoices').innerHTML=[1,2,3,4].map(n=>`<button class="choice" type="button" data-t="${n}">Tone ${n}</button>`).join('')}
-$('#quizPlay').onclick=()=>qi&&speak(qi[0],0.6);
-$('#quizNext').onclick=()=>{nextQuiz();speak(qi[0],0.6)};
-$('#quizChoices').addEventListener('click',e=>{const b=e.target.closest('.choice');if(!b||answered)return;answered=true;total++;
-  const ok=+b.dataset.t===qi[2];if(ok)right++;
-  b.classList.add(ok?'right':'wrong');if(!ok)$(`.choice[data-t="${qi[2]}"]`).classList.add('right');
-  $('#quizReveal').innerHTML=`<span class="han" style="font-size:1.3rem">${qi[0]}</span> ${qi[1]} · ${qi[3]}`;
-  $('#quizScore').textContent=`${right} / ${total}`});
-nextQuiz();
 
 /* HSKK */
 const KK=[
@@ -664,5 +768,6 @@ const RULES=[
 $('#rules').innerHTML=RULES.map(r=>`<div class="rule"><div><div class="ex">${r[0]}</div><div class="how">${r[1]}</div></div><button class="play" type="button" aria-label="Play ${r[0]}" data-say="${r[0].replace(' · ','，')}">▶</button></div>`).join('');
 $('#rules').addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(b)speak(b.dataset.say,0.65)});
 </script>
+<script src="features.js"></script>
 </body>
 </html>

@@ -7,9 +7,19 @@ English-language prep site for the HSK and HSKK. A static site: no server, no ru
 | File | What it is |
 |---|---|
 | `public/index.html` | The whole site (levels, vocabulary, tones, HSKK mock tasks, recording practice) |
+| `public/progress.js` | Saves progress, review words, mistakes and mock-test history in the learner's browser |
+| `public/features.js` | Tone trainer, listening practice, progress page and HSKK mock test |
 | `public/vocab.json` | HSK 3.0 levels 1–6 word list: `[level][i] = [hanzi, pinyin, English]` |
 | `wrangler.jsonc` | Cloudflare Workers config: serves the `public/` folder as a static site |
 | `functions/api/score.js` | Optional: paid detailed scoring through Azure. Not used unless you switch it on. |
+
+## Features
+
+- **Vocabulary**: all HSK 3.0 levels 1–6, search, mark words as known or add them to a review list.
+- **Tone trainer**: single tones, tone pairs (with tone changes) and “which word did you hear?”, with a list of your most common mix-ups.
+- **Listening practice**: original short dialogues, conversations and passages for HSK 1–6, multiple choice, transcript and English explanations.
+- **HSKK mock test**: Beginner / Intermediate / Advanced, with preparation time, prompts played once, automatic recording against a countdown, playback and history.
+- **My progress**: words known per level, accuracy, practice time, day streak and a mistake book. Stored in localStorage and IndexedDB on the learner's device; no account.
 
 ## How Record & score works (free, unlimited)
 
