@@ -46,7 +46,7 @@ function gPrice(lvl){
     const ds=pickDistinct([3,5,6,8,9,10,12,15,20,25,30,40].filter(x=>x!==n).map(x=>[`${lz(x)}块`,`${x} yuan`]),2);
     return {type:'Short dialogue',lines:[['W',`这个${g}多少钱？`],['M',`${lz(n)}块。`]],qs:[Q(`这个${g}多少钱？`,`How much is the ${gen}?`,c,ds,`He answers ${lz(n)}块: ${n} yuan.`)]}}
   const n=pk([2,3,4,5,6,8]),k=pk([2,3,4]);const t=n*k;const c=[`${lz(t)}块`,`${t} yuan`];
-  const ds=pickDistinct([n,t+n,t-n,t+k,n+k].filter(x=>x>0&&x!==t).map(x=>[`${lz(x)}块`,`${x} yuan`]),lvl>=4?3:2);
+  const ds=pickDistinct([...new Set([n,t+n,t-n,t+k,n+k,t+2,t-2,2*n+1])].filter(x=>x>0&&x!==t).map(x=>[`${lz(x)}块`,`${x} yuan`]),lvl>=4?3:2);
   return {type:'Short dialogue',lines:[['M',`${g}怎么卖？`],['W',`一个${lz(n)}块。`],['M',`我要${lz(k)}个。`]],qs:[Q('男的一共要付多少钱？','How much does the man pay in total?',c,ds,`${n} yuan each × ${k} = ${t} yuan.`)]};
 }
 const OBJS=[['手机','phone'],['书','book'],['杯子','cup'],['钥匙','keys'],['电脑','computer']];
