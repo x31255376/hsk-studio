@@ -1,0 +1,42 @@
+name: Generate audio
+
+# Run by hand from the Actions tab. Needs repository secrets AZURE_SPEECH_KEY and AZURE_SPEECH_REGION.
+on:
+  workflow_dispatch:
+    inputs:
+      requests_per_minute:
+        description: "Azure requests per minute (free F0 tier: 18; paid S0: 600)"
+        default: "18"
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generate-audio
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Generate clips (resumes where it stopped)
+        env:
+          AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
+          AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
+          REQUESTS_PER_MINUTE: ${{ inputs.requests_per_minute }}
+          MAX_MINUTES: "330"
+          COMMIT_EVERY: "400"
+        run: python3 tools/gen_audio.py
+      - name: Check tones of single-character clips
+        if: always()
+        run: |
+          node tools/tone_check.js || true
+          git add tools/tone_report.md || true
+          git diff --cached --quiet || (git commit -q -m "Update tone report" && (git push -q || (git pull -q --rebase && git push -q)))

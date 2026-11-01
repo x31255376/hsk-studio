@@ -12,32 +12,39 @@ const TONE_SHORT=['light','1st','2nd','3rd','4th'];
 
 /* ---------- speech helpers ---------- */
 function voicesZh(){if(!('speechSynthesis' in window))return [];return speechSynthesis.getVoices().filter(v=>/^zh/i.test(v.lang)).sort((a,b)=>(/CN/i.test(b.lang)?1:0)-(/CN/i.test(a.lang)?1:0))}
-function say(text,{rate=0.85,pitch=1,voice=null}={}){
-  // resolves when the line finishes; a timer backs it up in case the browser never fires onend
+function ttsSay(text,{rate=0.85,pitch=1,voice=null}={}){
+  // device voice fallback; resolves when the line finishes (a timer backs up browsers that never fire onend)
   return new Promise(res=>{
     const est=1200+text.length*320/rate;
     if(!('speechSynthesis' in window)){setTimeout(res,300);return}
-    const u=new SpeechSynthesisUtterance(text);u.lang='zh-CN';u.rate=rate;u.pitch=pitch;
+    const u=new SpeechSynthesisUtterance(text);u.lang='zh-CN';u.rate=Math.max(0.8,rate);u.pitch=pitch;
     const v=voice||zhVoice;if(v)u.voice=v;
     let done=false;const fin=()=>{if(!done){done=true;clearTimeout(t);res()}};
     const t=setTimeout(fin,est+4000);u.onend=fin;u.onerror=fin;speechSynthesis.speak(u);
   });
 }
+async function say(text,{rate=0.85,speaker='W',pitch=1,voice=null}={}){
+  if('speechSynthesis' in window)speechSynthesis.cancel();
+  const r=await HSKAudio.playClip(text,{speaker,rate:HSKAudio.playbackFor(rate)});
+  if(r==='missing')await ttsSay(text,{rate,pitch,voice});
+}
 let playToken=0;
 async function sayLines(lines,rate){
-  // lines: [speaker, text]; W = woman, M = man, Q = narrator
-  const my=++playToken;if('speechSynthesis' in window)speechSynthesis.cancel();
+  // lines: [speaker, text]; W = woman, M = man, Q = narrator (woman's voice)
+  const my=++playToken;HSKAudio.stopClip();if('speechSynthesis' in window)speechSynthesis.cancel();
   const vs=voicesZh();const vW=vs[0]||null,vM=vs[1]||vs[0]||null;
   for(const [who,text] of lines){
     if(my!==playToken)return false;
-    const opt=who==='W'?{voice:vW,pitch:1.15}:who==='M'?{voice:vM,pitch:vs.length>1?1:0.75}:{voice:vW,pitch:1};
-    await say(text,{rate,...opt});
+    const speaker=who==='M'?'M':'W';
+    // device-voice fallback only: a second installed voice for the man, otherwise a slightly lower pitch
+    const fb=who==='M'?{voice:vM,pitch:vs.length>1?1:0.9}:{voice:vW,pitch:1};
+    await say(text,{rate,speaker,...fb});
     if(my!==playToken)return false;
     await new Promise(r=>setTimeout(r,who==='Q'?200:350));
   }
   return my===playToken;
 }
-function stopAudio(){playToken++;if('speechSynthesis' in window)speechSynthesis.cancel()}
+function stopAudio(){playToken++;HSKAudio.stopClip();if('speechSynthesis' in window)speechSynthesis.cancel()}
 
 /* ================= TONE TRAINER ================= */
 const SINGLE_FALLBACK=[['八','bā'],['拔','bá'],['把','bǎ'],['爸','bà'],['汤','tāng'],['糖','táng'],['躺','tǎng'],['烫','tàng'],['书','shū'],['熟','shú'],['鼠','shǔ'],['树','shù'],['衣','yī'],['姨','yí'],['椅','yǐ'],['意','yì'],['妈','mā'],['麻','má'],['马','mǎ'],['骂','mà']];
@@ -408,5 +415,5 @@ function boot(){
   const wait=setInterval(()=>{if(VOCAB){clearInterval(wait);renderProgress();markCards();if(TT.mode!==0&&!TT.item)ttNew()}},300);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
-window.HSK_FEATURES={openListening,LISTEN,MOCK};
+window.HSK_FEATURES={openListening,LISTEN,MOCK,SINGLE_FALLBACK};
 })();

@@ -9,6 +9,9 @@ English-language prep site for the HSK and HSKK. A static site: no server, no ru
 | `public/index.html` | The whole site (levels, vocabulary, tones, HSKK mock tasks, recording practice) |
 | `public/progress.js` | Saves progress, review words, mistakes and mock-test history in the learner's browser |
 | `public/features.js` | Tone trainer, listening practice, progress page and HSKK mock test |
+| `public/audio.js` | Plays pre-generated voice clips from `public/audio/`, falling back to the device voice |
+| `public/tone.js` | Tone analysis shared by the page and `tools/tone_check.js` |
+| `tools/` | `texts.json` (every playable text), `gen_audio.py` (Azure neural voice generator), `tone_check.js`, `overrides.json` |
 | `public/vocab.json` | HSK 3.0 levels 1–6 word list: `[level][i] = [hanzi, pinyin, English]` |
 | `wrangler.jsonc` | Cloudflare Workers config: serves the `public/` folder as a static site |
 | `functions/api/score.js` | Optional: paid detailed scoring through Azure. Not used unless you switch it on. |
@@ -37,6 +40,23 @@ Accuracy improves after a learner's first few recordings, because the page learn
 
 The repository is connected to a Cloudflare Worker named `hsk-studio`. Every push to `main` rebuilds and redeploys automatically
 (`npx wrangler deploy`, using `wrangler.jsonc`). Microphone access needs HTTPS, which Cloudflare Pages provides automatically.
+
+## Natural audio (generated once)
+
+All model audio comes from clips in `public/audio/`, made once with Azure neural voices
+(woman/narrator: zh-CN-XiaoxiaoNeural, man: zh-CN-YunxiNeural). Single characters have their reading pinned with
+pinyin, so polyphonic characters are read the way the word list says.
+
+1. Create an Azure **Speech** resource (Free F0 tier is enough) and copy Key 1 and the Region.
+2. GitHub repository → Settings → Secrets and variables → Actions → New repository secret:
+   `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION` (e.g. `eastasia`).
+3. Actions tab → **Generate audio** → Run workflow. On the free tier (18 requests/minute) the ~5,500 clips take about
+   5 hours; the job commits every 400 clips, and you can run it again to continue. Paid S0 with 600/minute takes minutes
+   and costs well under US$1 for ~12,500 characters.
+4. After it finishes, read `tools/tone_report.md`. To fix a reading, add it to `tools/overrides.json`
+   (e.g. `{"行": "xing 2"}`), delete that clip from `public/audio/`, and run the workflow again.
+
+When you add new words or sentences, regenerate `tools/texts.json` and run the workflow; only new clips are made.
 
 ## Optional: detailed AI scoring later
 
