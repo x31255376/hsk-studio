@@ -264,6 +264,7 @@ function renderProgress(){
     [pct(P.tone.right,P.tone.total),'Tone listening',`${P.tone.total} syllables judged`],
     [pct(lt.right,lt.total),'Listening questions',`${lt.total} item${lt.total===1?'':'s'} answered`],
     [pct(P.pron.sylRight,P.pron.syl),'Tones you say',`${P.pron.attempts} recordings`],
+    ...['reading','writing'].map(k=>{const b=(P.skills||{})[k]||{right:0,total:0};return [pct(b.right,b.total),k==='reading'?'Reading':'Writing',`${b.total} answered`]}),
     [mins(P.days[H.today()]||0),'Practice today',`${mins(P.secs)} in total`],
     [H.streak()+'','Day streak','days with 1+ min']
   ].map(([v,k,s])=>`<div class="sc"><b>${v}</b><span>${k}</span><small class="note">${s}</small></div>`).join('');
@@ -530,5 +531,5 @@ function boot(){
   const wait=setInterval(()=>{if(VOCAB){clearInterval(wait);renderProgress();markCards();ttNew();prRender()}},300);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
-window.HSK_FEATURES={openListening,LISTEN,MOCK,MOCK_COUNTS,SINGLE_FALLBACK};
+window.HSK_FEATURES={openListening,LISTEN,MOCK,MOCK_COUNTS,SINGLE_FALLBACK,Deck};
 })();

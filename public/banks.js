@@ -238,9 +238,9 @@ function gMeet(lvl){const h=2+ri(8);const c=[`${lz(h)}点半`,`${h}:30`];const d
   return {type:'Short dialogue',lines:[['W','我们明天几点见面？'],['M',`本来说好${lz(h)}点，可是我得晚半个小时，${lz(h)}点半吧。`]],qs:[Q('他们明天几点见面？','When will they meet tomorrow?',c,ds,`Originally ${h}:00, but he will be half an hour (半个小时) late: ${h}:30.`)]}}
 const SPOTS=[['邮局','the post office'],['银行','the bank'],['地铁站','the subway station'],['超市','the supermarket'],['医院','the hospital']];
 function gRoute(lvl){const [p,pen]=pk(SPOTS);const n=1+ri(3);const dir=pk([['左','left'],['右','right']]);const askN=R()<0.5;
-  const lines=[['M',`请问，去${p}怎么走？`],['W',`一直往前走，到第${lz(n)}个路口往${dir[0]}拐就到了。`]];
-  if(askN){const c=[`第${lz(n)}个`,`the ${['','first','second','third'][n]}`];const ds=[1,2,3,4].filter(x=>x!==n).map(x=>[`第${lz(x)}个`,`the ${['','first','second','third','fourth'][x]}`]).slice(0,lvl>=4?3:2);
-    return {type:'Short dialogue',lines,qs:[Q(`去${p}要在第几个路口拐？`,`At which crossing should he turn for ${pen}?`,c,ds,`到第${lz(n)}个路口: the ${['','first','second','third'][n]} crossing.`)]}}
+  const lines=[['M',`请问，去${p}怎么走？`],['W',`一直往前走，到第${zh(n)}个路口往${dir[0]}拐就到了。`]];
+  if(askN){const c=[`第${zh(n)}个`,`the ${['','first','second','third'][n]}`];const ds=[1,2,3,4].filter(x=>x!==n).map(x=>[`第${zh(x)}个`,`the ${['','first','second','third','fourth'][x]}`]).slice(0,lvl>=4?3:2);
+    return {type:'Short dialogue',lines,qs:[Q(`去${p}要在第几个路口拐？`,`At which crossing should he turn for ${pen}?`,c,ds,`到第${zh(n)}个路口: the ${['','first','second','third'][n]} crossing.`)]}}
   const c=[`往${dir[0]}拐`,`turn ${dir[1]}`];const o=dir[0]==='左'?['往右拐','turn right']:['往左拐','turn left'];
   return {type:'Short dialogue',lines,qs:[Q('到了路口应该怎么走？','What should he do at the crossing?',c,[o,['一直往前走','keep going straight']].concat(lvl>=4?[['往回走','go back']]:[]),`往${dir[0]}拐: turn ${dir[1]}.`)]}}
 function gHotel(lvl){const p=pk([200,250,300,350,400]),n=2+ri(3);const t=p*n;const c=[`${t}元`,`${t} yuan`];const ds=pickDistinct([...new Set([p,t+p,t-p,p*(n+1),t+50,t-50])].filter(x=>x>0&&x!==t).map(x=>[`${x}元`,`${x} yuan`]),lvl>=4?3:2);

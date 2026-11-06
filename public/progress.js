@@ -1,7 +1,7 @@
 /* Progress store: everything lives in this browser's localStorage. No account, nothing uploaded. */
 (function(){
   const KEY='hskStudio.progress.v1';
-  const blank=()=>({known:{},review:{},tone:{right:0,total:0,conf:{}},listen:{byLevel:{},wrong:{}},pron:{attempts:0,syl:0,sylRight:0},
+  const blank=()=>({known:{},review:{},tone:{right:0,total:0,conf:{}},listen:{byLevel:{},wrong:{}},pron:{attempts:0,syl:0,sylRight:0},skills:{},
     secs:0,days:{},mock:[]});
   let P=blank();
   try{const raw=localStorage.getItem(KEY);if(raw){const v=JSON.parse(raw);P=Object.assign(blank(),v);
@@ -26,6 +26,7 @@
     recordTone(want,got){P.tone.total++;if(want===got)P.tone.right++;else{const k=`${want}>${got}`;P.tone.conf[k]=(P.tone.conf[k]||0)+1}save()},
     recordListening(id,lvl,ok){const b=P.listen.byLevel[lvl]||(P.listen.byLevel[lvl]={right:0,total:0});b.total++;if(ok){b.right++;delete P.listen.wrong[id]}else P.listen.wrong[id]=Date.now();save()},
     recordPron(rows){P.pron.attempts++;rows.forEach(r=>{if(!r.want)return;P.pron.syl++;if(r.ok)P.pron.sylRight++;else{const k=`${r.want}>${r.got||0}`;P.tone.conf['say:'+k]=(P.tone.conf['say:'+k]||0)+1}});save()},
+    recordSkill(name,ok){const b=P.skills[name]||(P.skills[name]={right:0,total:0});b.total++;if(ok)b.right++;save()},
     addMock(m){P.mock.unshift(m);P.mock=P.mock.slice(0,10);save()},
     removeMock(id){P.mock=P.mock.filter(m=>m.id!==id);save()},
     streak(){

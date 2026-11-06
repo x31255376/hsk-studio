@@ -192,7 +192,7 @@ select.search{appearance:auto}
 .rv-text{font-size:1.15rem}
 .rv audio{height:36px;max-width:100%}
 /* progress */
-.pg-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
+.pg-tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media (max-width:560px){.pg-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .pg-tiles .sc small{font-size:.75rem;letter-spacing:0;text-transform:none}
 .pg-levels{display:grid;gap:8px;margin-top:10px}
@@ -214,6 +214,25 @@ select.search{appearance:auto}
 .pr-choices .choice{display:grid;gap:2px;justify-items:center}
 .pr-choices .han{font-size:1.6rem}
 .pr-choices .py-choice,.pr-choices .pyl{font-size:1.15rem}
+/* reading & writing */
+.rw-body{display:grid;gap:12px}
+.rw-prompt{margin:0;font-size:1.05rem}
+.rw-prompt.han{font-size:1.3rem;line-height:1.8}
+.rw-text{border-left:3px solid var(--line);padding-left:12px;display:grid;gap:4px}
+.rw-text p{margin:0;font-size:1.15rem;line-height:1.8}
+.rw-q{display:grid;gap:8px}
+.rw-parts{display:grid;gap:8px}
+.rw-part{display:grid;grid-template-columns:auto 1fr;gap:10px;text-align:left;align-items:start}
+.rw-part .han{font-size:1.1rem;line-height:1.7;font-weight:400}
+.rw-part.used,.chip-btn.used{opacity:.4}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip-btn{font-size:1.25rem;padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.rw-answer{min-height:1.8em;margin:0;font-size:1.3rem;border-bottom:2px dashed var(--line);padding-bottom:4px}
+.gap{padding:0 6px;border-bottom:2px solid var(--jade);margin:0 4px}
+.big-han{font-size:1.6rem}
+.rw-area{width:100%;font:inherit;font-size:1.1rem;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);resize:vertical}
+.word-need.ok{background:var(--jade-soft);color:var(--jade)}
+.checks{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
 footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
@@ -230,7 +249,7 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
 </header>
 
 <nav aria-label="Sections"><div class="wrap">
-  <a href="#levels">Levels</a><a href="#vocab">Vocabulary</a><a href="#tones">Tones</a><a href="#listening">Listening</a><a href="#hskk">HSKK speaking</a><a href="#mock">Mock test</a><a href="#pron">Pronunciation</a><a href="#progress">My progress</a>
+  <a href="#levels">Levels</a><a href="#vocab">Vocabulary</a><a href="#tones">Tones</a><a href="#listening">Listening</a><a href="#reading">Reading</a><a href="#writing">Writing</a><a href="#hskk">HSKK speaking</a><a href="#mock">Mock test</a><a href="#pron">Pronunciation</a><a href="#progress">My progress</a>
 </div></nav>
 
 <main class="wrap">
@@ -307,6 +326,34 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
       <div class="transcript" id="lsTranscript" hidden></div>
       <div id="lsQs"></div>
       <div class="toolbar"><button class="btn ghost" id="lsPrev" type="button">Previous</button><button class="btn ghost" id="lsNext" type="button">Next question</button><span class="deckbar"><span class="deckpos num" id="lsPos"></span><button class="btn ghost small" type="button" id="lsShuf">⤮ Shuffle</button></span></div>
+    </div>
+  </section>
+
+  <section id="reading">
+    <div class="eyebrow">Reading</div>
+    <h2>Reading practice</h2>
+    <p class="lede">Thousands of items in the formats of the HSK reading paper: recognise words, match questions and replies, fill the gap, judge true or false, put sentences in order, and answer questions on short texts. Built from this site’s word list and texts.</p>
+    <div class="seg" id="rdLvl" role="group" aria-label="Reading practice level"></div>
+    <div class="seg" id="rdMode" role="group" aria-label="Reading practice task"></div>
+    <div class="panel quiz rw-card">
+      <div class="quiz-top"><span class="eyebrow" id="rdHead"></span><span class="deckbar"><span class="deckpos num" id="rdPos"></span><button class="btn ghost small" type="button" id="rdShuf">⤮ Shuffle</button></span></div>
+      <div id="rdBody" class="rw-body"></div>
+      <div class="reveal" id="rdReveal"></div>
+      <div class="toolbar"><button class="btn ghost" id="rdPrev" type="button">Previous</button><button class="btn ghost" id="rdNext" type="button">Next</button></div>
+    </div>
+  </section>
+
+  <section id="writing">
+    <div class="eyebrow">Writing</div>
+    <h2>Writing practice</h2>
+    <p class="lede">The HSK writing tasks from level 3 up: build a sentence from pieces, type characters from pinyin, write a sentence with a given word, and write a short text with five given words. Sentences are checked automatically; free writing shows a model to compare with.</p>
+    <div class="seg" id="wrLvl" role="group" aria-label="Writing practice level"></div>
+    <div class="seg" id="wrMode" role="group" aria-label="Writing practice task"></div>
+    <div class="panel quiz rw-card">
+      <div class="quiz-top"><span class="eyebrow" id="wrHead"></span><span class="deckbar"><span class="deckpos num" id="wrPos"></span><button class="btn ghost small" type="button" id="wrShuf">⤮ Shuffle</button></span></div>
+      <div id="wrBody" class="rw-body"></div>
+      <div class="reveal" id="wrReveal"></div>
+      <div class="toolbar"><button class="btn ghost" id="wrPrev" type="button">Previous</button><button class="btn ghost" id="wrNext" type="button">Next</button></div>
     </div>
   </section>
 
@@ -659,5 +706,6 @@ $('#rules').addEventListener('click',e=>{const b=e.target.closest('[data-say]');
 <script src="tone.js"></script>
 <script src="banks.js"></script>
 <script src="features.js"></script>
+<script src="rw.js"></script>
 </body>
 </html>
