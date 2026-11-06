@@ -3,7 +3,7 @@
 (function(){
 /* ---------- helpers ---------- */
 function rng(seed){let a=seed>>>0;return()=>{a=a+0x6D2B79F5>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
-const R=rng(20261101);
+let R=rng(20261101);   // reseeded below for later additions, so earlier items never change
 const ri=n=>Math.floor(R()*n);
 const pk=a=>a[ri(a.length)];
 function pickDistinct(pool,n,exclude){const out=[],ex=new Set(exclude||[]);let g=0;while(out.length<n&&g++<500){const x=pk(pool);const k=JSON.stringify(x);if(!ex.has(k)){ex.add(k);out.push(x)}}return out}
@@ -17,8 +17,8 @@ function Q(q,qEn,correct,distractors,why,extra){
   const opts=shuf([correct,...distractors]);const ans=opts.indexOf(correct);
   return Object.assign({q,qEn,opts:opts.map(o=>o[0]),en:opts.map(o=>o[1]),ans,why},extra||{});
 }
-function makeBank(target,gens,lvl){
-  const out=[],seen=new Set();let g=0;
+function makeBank(target,gens,lvl,seen){
+  const out=[];seen=seen||new Set();let g=0;
   while(out.length<target&&g++<target*60){const gen=pk(gens);const it=gen(lvl);if(!it)continue;const k=it.lines.map(l=>l[1]).join('|')+'|'+it.qs[0].q;if(seen.has(k))continue;seen.add(k);it.lvl=lvl;it.gen=true;out.push(it)}
   return out;
 }
@@ -98,7 +98,7 @@ function gJudge(lvl){
   // true/false: hear one sentence, judge the printed statement (HSK 1–4 style)
   const kind=ri(3);let line,claim,claimEn,truth,why;
   if(kind===0){const [a,aen]=pk(ACTS);const h=pk(HOURS);const say=tz(h,false);const shown=R()<0.5?say:tz(pk(HOURS.filter(x=>x!==h)),false);truth=shown===say;
-    line=`我今天有点儿忙，${say[0]}才能${a}。`;claim=`★ 他${shown[0]}${a}。`;claimEn=`True or false: he will ${aen} at ${shown[1]}.`;why=`He says ${say[0]}才能${a}: at ${say[1]}.`}
+    line=`我明天${say[0]}${a}，别忘了提醒我。`;claim=`★ 他明天${shown[0]}${a}。`;claimEn=`True or false: he will ${aen} at ${shown[1]} tomorrow.`;why=`He says 我明天${say[0]}${a}: at ${say[1]}.`}
   else if(kind===1){const t=pk(TRANS);const [p,pen]=pk(PLACES);const shown=R()<0.5?t:pk(TRANS.filter(x=>x!==t));truth=shown===t;
     line=`我家离${p}不远，我每天都${t[0]}去。`;claim=`★ 他每天${shown[0]}去${p}。`;claimEn=`True or false: he goes to ${pen} ${shown[1]} every day.`;why=`He says 每天都${t[0]}去: ${t[1]}.`}
   else{const cat=pk(LIKES);const [a,b]=pickDistinct(cat,2);const verb=cat===LIKES[0]?'吃':cat===LIKES[1]?'喝':'';const shown=R()<0.5?b:a;truth=shown===b;
@@ -214,6 +214,143 @@ const sp=[];const add=(lvl,mode,text,en)=>sp.push({lvl,mode,text,en});
  ['科学家研究发现，每天散步三十分钟，可以降低患心脏病的风险。而且，散步不需要任何器材，也不受年龄限制。研究人员建议，上班族可以选择提前一站下车，走路去公司。','Thirty minutes of walking a day.'],
  ['小李大学毕业后回到了家乡的小村子。他利用网络，把村里的水果卖到了全国各地。第一年，村民的收入就增加了一倍。现在，越来越多的年轻人愿意回到村里工作了。','A graduate sells village fruit online.']]
  .forEach(([a,b])=>add('Advanced','retell',a,b));
+
+/* ================= ADDITIONS (Nov 2026): new seed, appended after the original banks ================= */
+R=rng(20261106);
+const MONTH_EN=['','January','February','March','April','May','June','July','August','September','October','November','December'];
+function gBirthday(lvl){const m=1+ri(12),d=1+ri(28);const c=[`${zh(m)}月${zh(d)}号`,`${MONTH_EN[m]} ${d}`];
+  const cand=[[m,d+10],[m,d>10?d-10:d+5],[m===12?1:m+1,d],[m===1?12:m-1,d]];if(d<=12&&d!==m)cand.push([d,m]);
+  const ds=pickDistinct(cand.filter(([a,b])=>b>=1&&b<=31).map(([a,b])=>[`${zh(a)}月${zh(b)}号`,`${MONTH_EN[a]} ${b}`]).filter(x=>x[0]!==c[0]),lvl>=4?3:2);
+  return {type:'Short dialogue',lines:[['W','你的生日是几月几号？'],['M',`我的生日是${zh(m)}月${zh(d)}号。`]],qs:[Q('男的生日是几月几号？','When is the man’s birthday?',c,ds,`He says ${zh(m)}月${zh(d)}号: ${MONTH_EN[m]} ${d}.`)]}}
+const PLACE_ACT=[['商店','买东西','the shop','buy things'],['医院','看病','the hospital','see a doctor'],['学校','上课','school','go to class'],['饭馆','吃饭','a restaurant','have a meal'],['火车站','接朋友','the station','meet a friend'],['图书馆','看书','the library','read'],['超市','买水果','the supermarket','buy fruit']];
+function gGoWhere(lvl){const [p,a,pen,aen]=pk(PLACE_ACT);const others=pickDistinct(PLACE_ACT.filter(x=>x[0]!==p),lvl>=4?3:2);const askPlace=R()<0.5;
+  const lines=[['W',`你现在去哪儿？`],['M',`我去${p}${a}。`]];
+  return askPlace?{type:'Short dialogue',lines,qs:[Q('男的去哪儿？','Where is the man going?',[p,pen],others.map(x=>[x[0],x[2]]),`我去${p}: he is going to ${pen}.`)]}
+    :{type:'Short dialogue',lines,qs:[Q('男的去做什么？','What is the man going to do?',[a,aen],others.map(x=>[x[1],x[3]]),`去${p}${a}: he is going to ${aen}.`)]}}
+const THINGS=[['个','苹果','apples'],['本','书','books'],['个','杯子','cups'],['只','猫','cats'],['件','衣服','items of clothing'],['个','朋友','friends']];
+function gCount(lvl){const [m,t,ten]=pk(THINGS);const n=2+ri(8);const c=[`${lz(n)}${m}`,`${n}`];const ds=pickDistinct([n-1,n+1,n+2,n*2].filter(x=>x>0&&x!==n).map(x=>[`${lz(x)}${m}`,`${x}`]),lvl>=4?3:2);
+  return {type:'Short dialogue',lines:[['W',`你有几${m}${t}？`],['M',`我有${lz(n)}${m}。`]],qs:[Q(`男的有几${m}${t}？`,`How many ${ten} does the man have?`,c,ds,`我有${lz(n)}${m}: ${n} ${ten}.`)]}}
+const JOBS=[['医生','a doctor','医院'],['老师','a teacher','学校'],['司机','a driver','出租车公司'],['服务员','a waiter','饭馆'],['工程师','an engineer','一家电脑公司'],['律师','a lawyer','律师事务所'],['护士','a nurse','医院']];
+const RELS=[['姐姐','sister','她'],['哥哥','brother','他'],['妈妈','mother','她'],['爸爸','father','他'],['朋友','friend','他']];
+function gJob(lvl){const j=pk(JOBS);const [r,ren,pr]=pk(RELS);const ds=pickDistinct(JOBS.filter(x=>x!==j),lvl>=4?3:2);
+  return {type:'Short dialogue',lines:[['W',`你${r}做什么工作？`],['M',`${pr}是${j[0]}，在${j[2]}工作。`]],qs:[Q(`男的${r}是做什么的？`,`What does the man’s ${ren} do?`,[j[0],j[1]],ds.map(x=>[x[0],x[1]]),`${pr}是${j[0]}: ${j[1]}.`)]}}
+function gMeet(lvl){const h=2+ri(8);const c=[`${lz(h)}点半`,`${h}:30`];const ds=[[`${lz(h)}点`,`${h}:00`],[`${lz(h+1)}点`,`${h+1}:00`],[`${lz(h-1)}点半`,`${h-1}:30`]].slice(0,lvl>=4?3:2);
+  return {type:'Short dialogue',lines:[['W','我们明天几点见面？'],['M',`本来说好${lz(h)}点，可是我得晚半个小时，${lz(h)}点半吧。`]],qs:[Q('他们明天几点见面？','When will they meet tomorrow?',c,ds,`Originally ${h}:00, but he will be half an hour (半个小时) late: ${h}:30.`)]}}
+const SPOTS=[['邮局','the post office'],['银行','the bank'],['地铁站','the subway station'],['超市','the supermarket'],['医院','the hospital']];
+function gRoute(lvl){const [p,pen]=pk(SPOTS);const n=1+ri(3);const dir=pk([['左','left'],['右','right']]);const askN=R()<0.5;
+  const lines=[['M',`请问，去${p}怎么走？`],['W',`一直往前走，到第${lz(n)}个路口往${dir[0]}拐就到了。`]];
+  if(askN){const c=[`第${lz(n)}个`,`the ${['','first','second','third'][n]}`];const ds=[1,2,3,4].filter(x=>x!==n).map(x=>[`第${lz(x)}个`,`the ${['','first','second','third','fourth'][x]}`]).slice(0,lvl>=4?3:2);
+    return {type:'Short dialogue',lines,qs:[Q(`去${p}要在第几个路口拐？`,`At which crossing should he turn for ${pen}?`,c,ds,`到第${lz(n)}个路口: the ${['','first','second','third'][n]} crossing.`)]}}
+  const c=[`往${dir[0]}拐`,`turn ${dir[1]}`];const o=dir[0]==='左'?['往右拐','turn right']:['往左拐','turn left'];
+  return {type:'Short dialogue',lines,qs:[Q('到了路口应该怎么走？','What should he do at the crossing?',c,[o,['一直往前走','keep going straight']].concat(lvl>=4?[['往回走','go back']]:[]),`往${dir[0]}拐: turn ${dir[1]}.`)]}}
+function gHotel(lvl){const p=pk([200,250,300,350,400]),n=2+ri(3);const t=p*n;const c=[`${t}元`,`${t} yuan`];const ds=pickDistinct([...new Set([p,t+p,t-p,p*(n+1),t+50,t-50])].filter(x=>x>0&&x!==t).map(x=>[`${x}元`,`${x} yuan`]),lvl>=4?3:2);
+  return {type:'Short dialogue',lines:[['M',`你好，我想订一个房间，住${lz(n)}天。`],['W',`好的，一天${p}元，需要先付钱。`]],qs:[Q('男的一共要付多少钱？','How much will the man pay in total?',c,ds,`${p} yuan a night × ${n} nights = ${t} yuan.`)]}}
+const EXCH=[['有点儿大','a bit big','小'],['有点儿小','a bit small','大']];
+function gExchange(lvl){const e=pk(EXCH);const item=pk([['这件衣服','this top'],['这条裤子','these trousers'],['这双鞋','these shoes']]);
+  return {type:'Short dialogue',lines:[['W',`${item[0]}${e[0]}，能换一下吗？`],['M',`可以，我给您拿${e[2]}一号的。`]],qs:[Q(`女的为什么要换${item[0].slice(2)}？`,`Why does she want to exchange ${item[1]}?`,[e[0],e[1]],[EXCH.find(x=>x!==e).slice(0,2),['颜色不好看','she doesn’t like the color'],['质量不好','poor quality']],`${e[0]}: it is ${e[1]}, so he fetches one size ${e[2]==='小'?'smaller':'bigger'}.`)]}}
+const EVENTS2=[['足球比赛','the football match'],['运动会','the sports day'],['音乐节','the music festival']];
+const DAYS2=[['星期六','Saturday'],['星期天','Sunday'],['下个星期','next week']];
+function gPostpone(lvl){const [ev,een]=pk(EVENTS2);const w=pk([['大雨','heavy rain'],['大风','strong wind'],['大雪','heavy snow']]);const d2=pk(DAYS2);const askWhy=R()<0.5;
+  const lines=[['W',`天气预报说明天有${w[0]}，${ev}推迟到${d2[0]}了。`],['M','那我们就${d2[0]}再去吧。'.replace('${d2[0]}',d2[0])]];
+  return askWhy?{type:'Short dialogue',lines,qs:[Q(`${ev}为什么推迟了？`,`Why was ${een} postponed?`,[`明天有${w[0]}`,`${w[1]} tomorrow`],[['场地还没准备好','the venue isn’t ready'],['参加的人太少','too few people signed up'],['门票卖完了','tickets sold out']],`天气预报说明天有${w[0]}: ${w[1]} is forecast.`)]}
+    :{type:'Short dialogue',lines,qs:[Q(`${ev}推迟到什么时候了？`,`When was ${een} moved to?`,d2,DAYS2.filter(x=>x!==d2).concat([['明天','tomorrow']]).slice(0,3),`推迟到${d2[0]}: postponed to ${d2[1]}.`)]}}
+const SURVEYS=[[['大学生','university students'],[['每天运动','exercise every day'],['每周运动一两次','exercise once or twice a week'],['几乎不运动','hardly ever exercise']]],
+ [['上班族','office workers'],[['用手机看新闻','read news on their phones'],['看电视了解新闻','watch the news on TV'],['看报纸','read newspapers']]],
+ [['年轻人','young people'],[['周末喜欢待在家里','like staying home at weekends'],['周末喜欢出去玩','like going out at weekends'],['周末常常加班','often work at weekends']]],
+ [['家长','parents'],[['支持孩子学乐器','support children learning an instrument'],['觉得应该自己选择','think children should choose'],['不太支持','are not very supportive']]]];
+function gSurvey(lvl){const [g,opts]=pk(SURVEYS);const p1=pk([45,50,55,60,62,68]),p2=pk([20,25,28,30]);const p3=100-p1-p2;if(p3<=0)return null;
+  const ord=shuf([0,1,2]);const ps=[p1,p2,p3];const say=ord.map((oi,k)=>`百分之${zh(ps[k])}的${k?'人':g[0]}${opts[oi][0]}`);
+  const top=ord[0];
+  return {type:'Passage',lines:[['W',`一项调查显示，${say[0]}，${say[1]}，其余的${g[0]}${opts[ord[2]][0]}。`]],qs:[Q(`根据调查，比例最高的是哪种${g[0]}？`,`According to the survey, which group of ${g[1]} is largest?`,[opts[top][0]+'的',`those who ${opts[top][1]}`],[[opts[ord[1]][0]+'的',`those who ${opts[ord[1]][1]}`],[opts[ord[2]][0]+'的',`those who ${opts[ord[2]][1]}`],['三种人一样多','all three are equal']],`${p1}% ${opts[top][1]}, the largest share (${p2}% and ${p3}% for the others).`)]}}
+const BR_REASON=[['当地市场需求很大','strong local demand'],['那里的租金比较便宜','cheaper rent there'],['想吸引更多年轻顾客','to attract more young customers'],['当地政府提供了优惠政策','local government incentives']];
+function gBranch(lvl){const city=pk(['成都','杭州','西安','武汉','重庆']);const n=pk([3,5,8,10]);const r=pk(BR_REASON);const when=pk([['明年','next year'],['今年下半年','later this year']]);
+  return {type:'Passage',lines:[['W',`这家公司计划${when[0]}在${city}开${zh(n)}家新店，主要是因为${r[0]}。负责人表示，如果效果好，还会继续扩大规模。`]],qs:[Q('公司为什么要在那里开新店？','Why is the company opening new stores there?',r,BR_REASON.filter(x=>x!==r),`主要是因为${r[0]}: mainly ${r[1]}.`)]}}
+const POLICIES=[['在地铁里禁止大声打电话','为乘客提供安静的环境','give passengers a quiet ride'],['对新能源汽车免费开放部分停车场','鼓励市民使用新能源汽车','encourage electric cars'],['延长图书馆的开放时间','方便上班族晚上读书','let office workers read in the evening'],['在老城区增加公交线路','缓解交通压力','ease traffic'],['对垃圾分类做得好的小区给予奖励','提高居民的环保意识','raise environmental awareness']];
+function gPolicy(lvl){const city=pk(['本市','这座城市','北京','上海']);const p=pk(POLICIES);const others=pickDistinct(POLICIES.filter(x=>x!==p),3);
+  return {type:'Passage',lines:[['W',`从下个月起，${city}将${p[0]}，目的是${p[1]}。这项措施公布以后，受到了很多市民的欢迎。`]],qs:[Q('这项措施的目的是什么？','What is the aim of the measure?',[p[1],p[2]],others.map(x=>[x[1],x[2]]),`目的是${p[1]}: to ${p[2]}.`)]}}
+const PLAN_X={1:[gTime,gPrice,gWhere,gLike,gTransport,gBirthday,gGoWhere,gCount],2:[gBirthday,gGoWhere,gJob,gWeekday,gAge,gWeather,gPeople,gTime,gPrice,gCount],
+  3:[gMeet,gRoute,gHotel,gJob,gTransport,gCompare,gChange,gDuration,gJudge,gAge],4:[gRoute,gHotel,gExchange,gPostpone,gDiscount,gReason,gPlan,gJudge,gCompare,gChange],
+  5:[gPostpone,gSurvey,gBranch,gDiscount,gReason,gPlan,gPercent,gRevenue],6:[gSurvey,gBranch,gPolicy,gPercent,gRevenue,gPlan]};
+const TARGET_X={1:100,2:100,3:100,4:100,5:95,6:95};
+{const seen=new Set(listening.map(it=>it.lines.map(l=>l[1]).join('|')+'|'+it.qs[0].q));
+ for(let l=1;l<=6;l++)listening.push(...makeBank(TARGET_X[l],PLAN_X[l],l,seen));}
+
+/* HSKK additions */
+{const have=new Set(sp.map(x=>x.lvl+'|'+x.text));const addU=(lvl,mode,text,en)=>{if(have.has(lvl+'|'+text))return;have.add(lvl+'|'+text);add(lvl,mode,text,en)};
+ const list=(lvl,mode,str)=>str.split(';').forEach(s=>{const [a,b]=s.split('|');addU(lvl,mode,a.trim(),b.trim())});
+ const cap=e=>e[0].toUpperCase()+e.slice(1);
+ // Beginner repeat: remaining subject/time/place/activity combinations
+ {const S=[['我','I',false],['他','he',true],['我们','we',false],['我朋友','my friend',true],['她','she',true]];
+  const T=[['每天','every day'],['明天','tomorrow'],['周末','at the weekend']];
+  const P={在家:'at home',在学校:'at school',在公园:'in the park'};
+  const V=[['看书','read','reads',['在家','在学校','在公园']],['学习汉语','study Chinese','studies Chinese',['在家','在学校']],['跑步','go running','goes running',['在公园','在学校']],['喝茶','drink tea','drinks tea',['在家','在公园']],['听音乐','listen to music','listens to music',['在家','在公园']],['做饭','cook','cooks',['在家']]];
+  const all=[];S.forEach(s=>T.forEach(t=>V.forEach(v=>v[3].forEach(p=>{const en=t[0]==='明天'?`${s[1]} will ${v[1]} ${P[p]} tomorrow.`:`${s[1]} ${s[2]?v[2]:v[1]} ${P[p]} ${t[1]}.`;all.push([`${s[0]}${t[0]}${p}${v[0]}。`,cap(en)])}))));
+  shuf(all).forEach(x=>addU('Beginner','repeat',x[0],x[1]));
+  const LS=[['我','I',false],['他','He',true],['她','She',true],['我妈妈','My mother',true],['我们老师','Our teacher',true]];
+  const LX=[['吃饺子','eating dumplings'],['喝咖啡','drinking coffee'],['看电影','watching films'],['打篮球','playing basketball'],['唱歌','singing'],['去旅游','travelling'],['学汉语','learning Chinese'],['听中国音乐','listening to Chinese music']];
+  LS.forEach(s=>LX.forEach(x=>addU('Beginner','repeat',`${s[0]}很喜欢${x[0]}。`,`${s[1]} ${s[2]?'likes':'like'} ${x[1]} a lot.`)));
+  const BUY=[['个','苹果','apples'],['本','书','books'],['杯','咖啡','cups of coffee'],['张','电影票','film tickets'],['斤','水果','jin of fruit']];
+  [2,3,4,5].forEach(n=>BUY.forEach(b=>addU('Beginner','repeat',`我想买${lz(n)}${b[0]}${b[1]}。`,`I would like to buy ${n} ${b[2]}.`)));
+  list('Beginner','repeat','今天天气很好，我们去公园走走吧。|The weather is nice today, let’s go for a walk in the park.;今天太热了，我们在家看电视吧。|It’s too hot today, let’s watch TV at home.;下雨了，我们明天再去吧。|It’s raining, let’s go tomorrow instead.;外面很冷，你多穿点儿衣服。|It’s cold outside, wear more clothes.;我的手机没电了。|My phone has run out of battery.;你的汉语说得很好。|You speak Chinese very well.;这家饭馆的菜很好吃。|The food at this restaurant is very good.;我昨天晚上没睡好。|I didn’t sleep well last night.;请你再说一遍。|Please say it again.;我们一起去吃饭吧。|Let’s go and eat together.');
+ }
+ // Beginner answer: question templates
+ '吃饺子|eating dumplings;喝咖啡|drinking coffee;看书|reading;打篮球|playing basketball;踢足球|playing football;看电视|watching TV;听音乐|listening to music;去公园|going to the park;下雪|snow;吃水果|eating fruit;唱歌|singing;旅游|travelling'.split(';').forEach(s=>{const [a,b]=s.split('|');addU('Beginner','answer',`你喜欢${a}吗？`,`Do you like ${b}?`)});
+ '开车|drive;游泳|swim;做饭|cook;唱中文歌|sing Chinese songs;写汉字|write Chinese characters;骑自行车|ride a bike;打乒乓球|play table tennis;用筷子|use chopsticks'.split(';').forEach(s=>{const [a,b]=s.split('|');addU('Beginner','answer',`你会${a}吗？`,`Can you ${b}?`)});
+ '商店|a shop;医院|a hospital;公园|a park;饭馆|a restaurant;地铁站|a subway station;银行|a bank;超市|a supermarket;学校|a school'.split(';').forEach(s=>{const [a,b]=s.split('|');addU('Beginner','answer',`你家附近有${a}吗？`,`Is there ${b} near your home?`)});
+ list('Beginner','answer','你今天吃早饭了吗？|Did you have breakfast today?;你昨天做什么了？|What did you do yesterday?;你喜欢什么水果？|What fruit do you like?;你一般几点吃晚饭？|When do you usually have dinner?;你最喜欢的颜色是什么？|What is your favourite color?;你明天想做什么？|What do you want to do tomorrow?;你有几个好朋友？|How many good friends do you have?;你喜欢一个人吃饭吗？|Do you like eating alone?;你家离学校远吗？|Is your home far from school?;你现在住的地方大不大？|Is the place you live big?;你今天几点起床的？|What time did you get up today?;你喜欢春天还是秋天？|Spring or autumn?;你每天学习汉语多长时间？|How long do you study Chinese each day?;你觉得汉语难吗？|Do you think Chinese is hard?;你的生日快到了吗？|Is your birthday coming soon?');
+ // Beginner talk
+ list('Beginner','talk','请介绍一下你自己。|Introduce yourself.;请说说你的周末。|Describe your weekend.;你喜欢什么水果？为什么？|What fruit do you like, and why?;请介绍一下你的房间。|Describe your room.;你一般怎么去学校或者公司？|How do you usually get to school or work?;请说说你喜欢的一个电影。|Talk about a film you like.;你喜欢什么天气？为什么？|What weather do you like, and why?;请说说你的一个好朋友。|Talk about a good friend.;你昨天做了什么？|What did you do yesterday?;请介绍一下你家附近的地方。|Describe the area near your home.;你喜欢喝什么？为什么？|What do you like to drink, and why?;你学习汉语的时候觉得什么最难？|What is hardest for you when learning Chinese?;请说说你最喜欢的一个节日。|Talk about your favourite festival.;你想去哪个国家旅游？为什么？|Which country would you like to visit, and why?;请说说你的家人喜欢做什么。|What does your family like to do?;你喜欢早上还是晚上？为什么？|Do you prefer mornings or evenings, and why?;请介绍一下你喜欢的一家饭馆。|Describe a restaurant you like.;你平时怎么学习汉语？|How do you usually study Chinese?;你最喜欢穿什么颜色的衣服？|What color clothes do you like to wear?;请说说你明天的计划。|Talk about your plans for tomorrow.');
+ // Intermediate repeat: more patterns
+ {const CR=[['不下雨','it doesn’t rain'],['天气好','the weather is good'],['有时间','we have time'],['不太忙','we aren’t too busy'],['你也有空','you are free too'],['作业不多','there isn’t much homework']];
+  const RR=[['去爬山','go hiking'],['去公园散步','go for a walk in the park'],['一起去看电影','go to a film together'],['去海边玩','go to the seaside'],['去朋友家玩','visit a friend'],['去超市买东西','go shopping at the supermarket']];
+  CR.forEach(c=>RR.forEach(r=>addU('Intermediate','repeat',`如果明天${c[0]}，我们就${r[0]}。`,`If ${c[1]} tomorrow, we will ${r[1]}.`)));
+  const PAIR=[['听音乐','做作业','listens to music while doing homework'],['喝咖啡','看报纸','reads the paper while drinking coffee'],['走路','打电话','talks on the phone while walking'],['吃饭','看电视','watches TV while eating'],['唱歌','跳舞','sings while dancing'],['做饭','听新闻','listens to the news while cooking'],['开车','听音乐','listens to music while driving'],['喝茶','聊天','chats while drinking tea']];
+  [['他','He'],['我妹妹','My younger sister'],['我朋友','My friend'],['我爸爸','My father'],['她','She']].forEach(s=>PAIR.forEach(p=>addU('Intermediate','repeat',`${s[0]}一边${p[0]}，一边${p[1]}。`,`${s[1]} ${p[2]}.`)));
+  const PLN=[['去北京旅游','travel to Beijing'],['搬家','move house'],['学开车','learn to drive'],['换一份工作','change jobs'],['回国看父母','go home to see my parents']];
+  const PS=[['我','I','plan'],['他','He','plans'],['我姐姐','My sister','plans']];const PT=[['这个周末','this weekend'],['下个月','next month'],['明年','next year']];
+  PS.forEach(s=>PT.forEach(t=>PLN.forEach(p=>addU('Intermediate','repeat',`${s[0]}打算${t[0]}${p[0]}。`,`${s[1]} ${s[2]} to ${p[1].replace('my parents',s[0]==='我'?'my parents':s[0]==='他'?'his parents':'her parents')} ${t[1]}.`))));
+  list('Intermediate','repeat','因为昨天下大雨，所以比赛推迟了。|The match was postponed because of heavy rain yesterday.;因为他每天坚持练习，所以汉语进步得很快。|Because he practises every day, his Chinese improved quickly.;因为路上堵车，所以我迟到了十分钟。|I was ten minutes late because of traffic.;因为这家店的菜很便宜，所以每天都有很多人。|This restaurant is always busy because it is cheap.;因为明天要考试，所以今天晚上我得好好复习。|I have an exam tomorrow, so I must revise tonight.;因为天气太冷，所以我们没出去。|It was too cold, so we stayed in.;因为她很喜欢中国文化，所以决定来中国留学。|She loves Chinese culture, so she decided to study in China.;因为手机坏了，所以我没接到你的电话。|My phone broke, so I missed your call.;虽然他很年轻，但是工作经验很丰富。|Although he is young, he is very experienced.;虽然这个房子不大，但是很干净。|Although the flat isn’t big, it is very clean.;虽然汉字很难写，但是我觉得很有意思。|Characters are hard to write, but I find them interesting.;虽然我们很久没见面了，但是一直保持联系。|Although we haven’t met for ages, we keep in touch.;虽然考试没考好，但是他没有放弃。|He didn’t do well in the exam, but he didn’t give up.;请你把手机关了，好吗？|Could you turn off your phone, please?;请你把这封信交给王老师，好吗？|Could you give this letter to Teacher Wang, please?;请你把桌子上的东西收拾一下，好吗？|Could you tidy up the table, please?;我已经把作业做完了。|I have finished my homework.;他把钥匙忘在办公室了。|He left his keys in the office.;她把房间打扫得很干净。|She cleaned the room very well.;这家饭馆比那家便宜多了。|This restaurant is much cheaper than that one.;今年夏天比去年热多了。|This summer is much hotter than last year.;坐高铁比坐飞机方便多了。|The high-speed train is much more convenient than flying.;我的房间比你的小一点儿。|My room is a bit smaller than yours.;他跑得比我快多了。|He runs much faster than me.;我学汉语已经学了一年半了。|I have been learning Chinese for a year and a half.;我们在这儿等了半个小时了。|We have been waiting here for half an hour.;他每天都要跑五公里。|He runs five kilometres every day.;你最好早点儿去，不然会没有座位。|You’d better go early or there won’t be seats.;只要你努力，就一定能通过考试。|As long as you work hard, you will pass.;我不但喜欢看中国电影，而且喜欢听中国歌。|I like Chinese films and Chinese songs too.;这件事你最好先问问老师。|You’d better ask the teacher first.;你别着急，慢慢说。|Don’t worry, take your time.');
+ }
+ // Intermediate: pictures
+ list('Intermediate','picture','一位老师在黑板上写字，学生们在认真听。|Picture: a teacher writing on the board while students listen carefully.;一家人在海边玩，孩子在堆沙子。|Picture: a family at the beach, a child is building a sandcastle.;一个人在雨中跑向公共汽车站。|Picture: someone running through the rain to a bus stop.;一个男孩在过马路，交通灯是红色的。|Picture: a boy crossing the road while the light is red.;几个人在公园里跳广场舞。|Picture: a group of people square-dancing in a park.;一个女孩坐在窗边看书，外面在下雪。|Picture: a girl reading by the window while it snows outside.;一个快递员在门口按门铃，手里拿着一个大箱子。|Picture: a delivery driver ringing a doorbell, holding a big box.;医院里很多人在排队挂号。|Picture: many people queuing to register at a hospital.;一个小孩在生日蛋糕前许愿。|Picture: a child making a wish in front of a birthday cake.;一个人在健身房里跑步，满头大汗。|Picture: someone running on a treadmill in a gym, dripping with sweat.;两个人在饭馆里为了谁付钱而争论。|Picture: two people in a restaurant arguing over who pays.;一个老人在帮小朋友过马路。|Picture: an old man helping a child cross the road.;一个人站在地图前，看起来迷路了。|Picture: someone standing in front of a map, looking lost.;一个学生在考试，看起来很紧张。|Picture: a student taking an exam, looking nervous.;一个女人在花店里买花。|Picture: a woman buying flowers in a florist.;两个孩子在吵架，妈妈在旁边劝他们。|Picture: two children quarrelling while their mother calms them.;一个男人在厨房里洗碗，碗很多。|Picture: a man washing a big pile of dishes in a kitchen.;一群年轻人在山顶上拍照。|Picture: a group of young people taking photos on a mountain top.;一个人在机场的行李转盘前等行李。|Picture: someone waiting at the baggage carousel in an airport.;一位顾客在超市收银台付钱，后面排着长队。|Picture: a customer paying at a supermarket checkout with a long queue behind.');
+ // Intermediate: talk
+ list('Intermediate','talk','你觉得一个人生活好还是和家人一起生活好？|Living alone or with family: which is better?;请谈谈你最喜欢的一种运动。|Talk about your favourite sport.;你平时怎么锻炼身体？|How do you keep fit?;你觉得上网课和去教室上课哪个更好？|Online classes or classroom classes?;请谈谈你第一次来中国或者第一次学汉语的经历。|Describe your first time in China or first Chinese lesson.;你觉得应该怎样和邻居相处？|How should you get along with neighbours?;你最喜欢的中国菜是什么？为什么？|What is your favourite Chinese dish, and why?;请谈谈你的家乡有什么特别的地方。|What is special about your hometown?;你觉得周末应该休息还是学习？|Should weekends be for rest or study?;请谈谈你买东西时最看重什么。|What matters most to you when shopping?;你觉得孩子应该从小学外语吗？|Should children learn a foreign language early?;请说说你遇到过的一次困难，你是怎么解决的。|Describe a difficulty you faced and how you solved it.;你喜欢什么样的天气？为什么？|What weather do you like, and why?;你觉得什么样的朋友是好朋友？|What makes a good friend?;请谈谈你最近学会的一件事。|Talk about something you learned recently.;你觉得手机会影响学习吗？|Do phones affect studying?;你觉得应该怎样节约用水？|How can we save water?;请谈谈你理想中的家。|Describe your ideal home.;你觉得旅游的时候跟团好还是自由行好？|Group tours or independent travel?;请介绍一下你们国家的一种传统食物。|Describe a traditional food from your country.;你一般怎么过春节或者新年？|How do you spend New Year?;你觉得早上运动好还是晚上运动好？|Exercise in the morning or the evening?;请谈谈你喜欢的一个季节。|Talk about a season you like.;你觉得学习汉语对你的工作有什么帮助？|How does Chinese help your work?;你觉得城市里应该多建公园吗？|Should cities build more parks?;请谈谈你小时候的梦想。|Talk about your childhood dream.;你平时喜欢在哪里学习？为什么？|Where do you like to study, and why?;你觉得网上的评价可以相信吗？|Can you trust online reviews?;请谈谈你最喜欢的一个老师。|Talk about your favourite teacher.;你怎么看待在网上交朋友？|What do you think of making friends online?');
+ // Advanced: talk
+ list('Advanced','talk','你认为人们为什么越来越重视健康饮食？|Why do people care more about healthy eating?;有人说“压力就是动力”，你同意吗？|“Pressure is motivation.” Do you agree?;你怎么看待大学生毕业后先旅行再工作？|Should graduates travel before working?;你认为城市应该限制私家车吗？|Should cities limit private cars?;谈谈你对“慢生活”的看法。|What do you think of “slow living”?;你认为网络购物对实体店有什么影响？|How does online shopping affect physical shops?;有人说“兴趣是最好的老师”，你怎么看？|“Interest is the best teacher.” Discuss.;你怎么看待年轻人频繁跳槽？|What do you think of young people changing jobs often?;你认为应该怎样培养孩子的阅读习惯？|How can we build children’s reading habits?;谈谈科技发展给老年人带来的困难。|What difficulties does technology create for the elderly?;你认为旅游业的发展对当地有什么利弊？|Pros and cons of tourism for local places?;有人认为考试不能反映真实能力，你同意吗？|Do exams fail to reflect real ability?;你怎么看待“断舍离”这种生活方式？|What do you think of decluttering as a lifestyle?;你认为外卖行业的发展带来了哪些问题？|What problems has food delivery brought?;谈谈你对团队合作的理解。|What does teamwork mean to you?;你认为应该怎样看待失败？|How should we view failure?;有人说“距离产生美”，你怎么看？|“Distance makes the heart grow fonder.” Discuss.;你认为城市和农村的教育差距应该怎样缩小？|How can the urban–rural education gap be narrowed?;你怎么看待人们在社交媒体上展示生活？|What do you think of showing your life on social media?;你认为一个国家的发展最需要什么？|What does a country need most to develop?;谈谈你对“工作和生活平衡”的看法。|What do you think about work–life balance?;你认为应该怎样减少浪费粮食？|How can we reduce food waste?;有人说“性格决定命运”，你同意吗？|“Character determines fate.” Do you agree?;你怎么看待越来越多的人养宠物？|What do you think of more people keeping pets?;你认为学历和能力哪个更重要？|Which matters more, qualifications or ability?;谈谈你对网络语言的看法。|What do you think of internet slang?;你认为应该怎样保护传统手工艺？|How should traditional crafts be protected?;有人说“读书改变命运”，你怎么看？|“Education changes destiny.” Discuss.;你怎么看待人们越来越晚结婚？|What do you think of people marrying later?;你认为人工智能会怎样改变教育？|How will AI change education?');
+ // Advanced: read aloud
+ [['我的爷爷是一位退休的老师。他每天早上六点起床，先去公园散步，然后回家看报纸。他常说，人老了不能停止学习。去年，他开始学用智能手机，现在不但会视频聊天，还会在网上买东西。看着他认真的样子，我觉得学习真的没有年龄限制。','Grandfather keeps learning.'],
+  ['在城市里生活久了，很多人都想念乡村的安静。周末的时候，我喜欢开车去郊外，走一走田间的小路，看一看蓝天白云。虽然只有短短的两天，却能让我忘记工作的压力。回到城市以后，我又有了新的力气。','Weekends in the countryside.'],
+  ['学习一门外语，最重要的是坚持。刚开始的时候，每个人都会遇到困难，比如听不懂、说不好。这时候，很多人选择了放弃。其实，只要每天花一点时间练习，慢慢地就会发现自己的进步。语言就像一颗种子，需要时间才能长大。','Learning a language takes persistence.'],
+  ['我家楼下有一家小面馆，开了快二十年了。老板是一对老夫妻，每天天不亮就开始和面。他们的面条很筋道，汤也特别香。附近的居民都喜欢来这儿吃早饭。对我来说，这碗面已经不只是一顿饭，而是家的味道。','The noodle shop downstairs.'],
+  ['手机让我们的生活变得更方便了。我们可以用它付钱、叫车、看新闻、和朋友聊天。可是，也有人整天低头看手机，忽视了身边的人。有一次，我和家人吃饭的时候，大家都在看手机，没有人说话。从那以后，我们约定吃饭的时候不用手机。','Phones at the dinner table.'],
+  ['秋天是我最喜欢的季节。天气不冷也不热，天空又高又蓝。公园里的树叶变成了黄色和红色，风一吹，叶子就像蝴蝶一样飞下来。每到这个时候，我都会约上几个朋友，一起去爬山，拍照，享受秋天的美好。','Autumn, my favourite season.']].forEach(([a,b])=>addU('Advanced','read',a,b));
+ // Advanced: retell
+ [['小张很喜欢拍照，可是他一直觉得自己的照片不够好。有一天，他把照片发到网上，没想到很多人都很喜欢，还有一家杂志联系他，想用他的照片。小张这才明白，只要坚持做自己喜欢的事，总会有人欣赏。','A photographer finds an audience.'],
+  ['一位年轻的妈妈发现，孩子总是不爱吃蔬菜。后来，她让孩子和她一起去菜市场买菜，回家后一起做饭。孩子自己做的菜，吃得特别香。妈妈说，让孩子参与，比强迫他吃更有效。','Getting a child to eat vegetables.'],
+  ['有一家公司规定，员工每天下午可以休息十五分钟，喝喝茶、聊聊天。刚开始，有人担心这样会影响工作。可是几个月以后，大家发现工作效率反而提高了，员工也更愿意留在公司。','A company introduces afternoon breaks.'],
+  ['小王第一次去外地出差，下了飞机才发现钱包丢了。正在着急的时候，机场的工作人员找到了他的钱包，里面的东西一样也没少。小王非常感动，回去以后专门写了一封感谢信。','A lost wallet at the airport.'],
+  ['有个年轻人每天上班要坐一个小时的地铁。他觉得这段时间很浪费，于是开始在地铁上听英语课。一年以后，他的英语水平提高了很多，还因此得到了一个去国外工作的机会。','Using the commute to learn English.'],
+  ['在一个小城市里，有一位老人开了一家免费的修车店，专门帮学生修自行车。他说，自己年轻的时候也很穷，得到过别人的帮助，现在想把这份温暖传下去。','An old man repairs students’ bikes for free.'],
+  ['研究发现，经常和别人一起吃饭的人，心情往往更好。专家认为，吃饭的时候聊天，可以减轻压力，增进感情。因此，他们建议大家，无论工作多忙，每周都要和家人或朋友一起吃几顿饭。','Eating together improves mood.'],
+  ['一家书店的生意越来越差。老板想了一个办法：把书店的一部分改成咖啡馆，还经常举办读书活动。没想到，来的人越来越多，书也卖得更好了。现在，这家书店成了年轻人周末最喜欢去的地方。','A bookshop adds a café.'],
+  ['小李大学学的是计算机，但是他最喜欢的是做饭。毕业以后，他没有去公司上班，而是开了一个美食视频账号，教大家做家常菜。现在，他已经有了几十万粉丝，还出版了自己的菜谱。','A graduate becomes a cooking video creator.'],
+  ['有一位老师发现，班上有个学生上课总是不说话。老师没有批评他，而是请他负责照顾班里的植物。慢慢地，这个学生变得开朗了，还主动在课上分享了自己养植物的经验。','A quiet student finds his voice.']].forEach(([a,b])=>addU('Advanced','retell',a,b));
+}
+
+/* HSKK additions, part 2 */
+{const have=new Set(sp.map(x=>x.lvl+'|'+x.text));const addU=(lvl,mode,text,en)=>{if(have.has(lvl+'|'+text))return;have.add(lvl+'|'+text);add(lvl,mode,text,en)};
+ // Beginner: going somewhere
+ const S=[['我','I','am'],['他','He','is'],['我们','We','are'],['我朋友','My friend','is'],['她','She','is']];
+ const T=[['明天','tomorrow'],['下午','this afternoon'],['周末','at the weekend']];
+ const G=[['商店','the shop'],['医院','the hospital'],['北京','Beijing'],['朋友家','a friend’s home'],['学校','school'],['饭馆','a restaurant'],['火车站','the station']];
+ S.forEach(s=>T.forEach(t=>G.forEach(g=>addU('Beginner','repeat',`${s[0]}${t[0]}要去${g[0]}。`,`${s[1]} ${s[2]} going to ${g[1]} ${t[1]}.`))));
+ // Intermediate: in progress / duration
+ const S2=[['我','I','am','have'],['他','He','is','has'],['我妈妈','My mother','is','has'],['我们','We','are','have'],['她','She','is','has']];
+ const V2=[['做饭','cooking'],['看书','reading'],['打电话','on the phone'],['开会','in a meeting'],['写作业','doing homework'],['洗衣服','doing the laundry'],['睡觉','sleeping'],['上课','in class']];
+ S2.forEach(s=>V2.forEach(v=>addU('Intermediate','repeat',`${s[0]}正在${v[0]}呢，等一会儿再说吧。`,`${s[1]} ${s[2]} ${v[1]} right now, let’s talk a bit later.`)));
+ const D2=[['在中国住','lived in China'],['学汉语','studied Chinese'],['在这家公司工作','worked at this company']];
+ S2.forEach(s=>D2.forEach(d=>[2,3,5].forEach(n=>addU('Intermediate','repeat',`${s[0]}${d[0]}了${lz(n)}年了。`,`${s[1]} ${s[3]} ${d[1]} for ${n} years.`))));
+}
 
 /* ================= PRONUNCIATION BANK (needs the word list) ================= */
 const INITIALS=['zh','ch','sh','b','p','m','f','d','t','n','l','g','k','h','j','q','x','r','z','c','s','y','w'];
