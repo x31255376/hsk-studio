@@ -233,6 +233,10 @@ select.search{appearance:auto}
 .rw-area{width:100%;font:inherit;font-size:1.1rem;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);resize:vertical}
 .word-need.ok{background:var(--jade-soft);color:var(--jade)}
 .checks{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+/* jump to top / bottom */
+.jump{position:fixed;z-index:15;right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));display:grid;gap:8px}
+.jump button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:1.2rem;box-shadow:0 4px 14px rgba(10,20,30,.15);cursor:pointer}
+.jump button:hover{border-color:var(--jade);color:var(--jade)}
 footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
@@ -429,6 +433,11 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
 
 <footer class="wrap">Model audio is a natural neural voice recorded for every word and sentence; if a clip is missing, your device's built-in voice is used instead. Tone checks run entirely on your device: your recording is analysed in the browser and never uploaded. Where your browser offers speech recognition, it also checks which characters were understood. Word list: HSK 3.0 syllabus via the open-source complete-hsk-vocabulary project (MIT), definitions from CC-CEDICT. Exam formats vary by test centre; confirm on chinesetest.cn. Practice sentences are original.</footer>
 
+<div class="jump" id="jump">
+  <button type="button" id="jumpTop" aria-label="Back to top" hidden>↑</button>
+  <button type="button" id="jumpBottom" aria-label="Go to bottom">↓</button>
+</div>
+
 <div class="sheet" id="practice" role="dialog" aria-label="Pronunciation practice" hidden>
   <div class="sheet-in">
     <div class="sheet-head">
@@ -454,6 +463,15 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
   </div>
 </div>
 
+<script>
+(function(){const top=document.getElementById('jumpTop'),bot=document.getElementById('jumpBottom'),box=document.getElementById('jump');
+  const smooth=!matchMedia('(prefers-reduced-motion: reduce)').matches?'smooth':'auto';
+  top.onclick=()=>scrollTo({top:0,behavior:smooth});
+  bot.onclick=()=>scrollTo({top:document.documentElement.scrollHeight,behavior:smooth});
+  function upd(){const y=scrollY,max=document.documentElement.scrollHeight-innerHeight;top.hidden=y<400;bot.hidden=y>max-200;
+    const sheet=document.getElementById('practice');box.hidden=!!(sheet&&!sheet.hidden)}
+  addEventListener('scroll',upd,{passive:true});addEventListener('resize',upd);setInterval(upd,800);upd()})();
+</script>
 <script src="audio.js"></script>
 <script src="progress.js"></script>
 <script>
