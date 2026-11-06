@@ -42,7 +42,7 @@ button{font:inherit;cursor:pointer}
 .hero{padding-block:48px 32px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end}
 .hero h1{font-size:clamp(2.2rem,6vw,3.6rem);line-height:1.05}
 .hero p{margin-top:14px;color:var(--muted);font-size:1.05rem}
-.stamp{width:132px;height:132px;border:3px solid var(--cinnabar);color:var(--cinnabar);border-radius:10px;display:grid;place-items:center;transform:rotate(-6deg);font-family:var(--han);font-weight:700;font-size:1.9rem;line-height:1.1;text-align:center;padding:10px}
+.stamp{text-decoration:none;cursor:pointer;width:132px;height:132px;border:3px solid var(--cinnabar);color:var(--cinnabar);border-radius:10px;display:grid;place-items:center;transform:rotate(-6deg);font-family:var(--han);font-weight:700;font-size:1.9rem;line-height:1.1;text-align:center;padding:10px}
 .stamp small{display:block;font-family:var(--body);font-size:.62rem;letter-spacing:.14em;font-weight:600;margin-top:4px}
 @media (max-width:560px){.hero{grid-template-columns:1fr}.stamp{width:104px;height:104px;font-size:1.4rem}}
 
@@ -245,7 +245,7 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
     <h1>Prepare for the HSK and HSKK, explained in English.</h1>
     <p>The HSK is the official Chinese proficiency test for non-native speakers, used for university admission, scholarships and work in China. The HSKK is its speaking test. Find your level, learn the words, and rehearse the speaking tasks out loud.</p>
   </div>
-  <div class="stamp" aria-hidden="true">四级<small>HSK 4</small></div>
+  <a class="stamp" id="myLevel" href="#levels" aria-label="My level: choose in Levels"><span id="myLevelZh">选级</span><small id="myLevelEn">PICK LEVEL</small></a>
 </header>
 
 <nav aria-label="Sections"><div class="wrap">
@@ -499,7 +499,19 @@ function showLevel(i){const L=LEVELS[i];
   $('#lvlBar').style.width=(L.words/5000*100)+'%';
   $('#lvlCan').textContent=L.can;
   $('#lvlKv').innerHTML=`<dt>Sections</dt><dd>${L.secs}</dd><dt>Length</dt><dd>${L.q}</dd><dt>Pass mark</dt><dd>${L.pass}</dd><dt>Speaking test</dt><dd><span class="chip">${L.kk}</span></dd><dt>HSK 3.0 equivalent</dt><dd>${L.band}</dd>`;}
-seg($('#lvlSeg'),[1,2,3,4,5,6].map(n=>'HSK '+n),showLevel,3);showLevel(3);
+/* "my level": set in Levels, shown on the stamp, applied to every section, remembered in this browser */
+const ZH_LVL=['一','二','三','四','五','六'];
+function paintStamp(i){$('#myLevelZh').textContent=i==null?'选级':ZH_LVL[i]+'级';$('#myLevelEn').textContent=i==null?'PICK LEVEL':'HSK '+(i+1)}
+function pressSeg(sel,idx){const b=document.querySelectorAll(sel+' button')[idx];if(b&&b.getAttribute('aria-pressed')!=='true')b.click()}
+function applyMyLevel(i){
+  // vocabulary (first tab is "All levels"), listening, reading & writing groups, HSKK drills and mock test
+  pressSeg('#vocabSeg',i+1);pressSeg('#lsSeg',i);
+  const g=i<=1?0:i<=3?1:2;pressSeg('#rdLvl',g);pressSeg('#wrLvl',g);pressSeg('#spLvl',g);pressSeg('#mxSeg',g);
+}
+let myLevel=null;try{const v=localStorage.getItem('hskStudio.myLevel');if(v!==null&&v!=='')myLevel=+v}catch(e){}
+seg($('#lvlSeg'),[1,2,3,4,5,6].map(n=>'HSK '+n),i=>{showLevel(i);myLevel=i;try{localStorage.setItem('hskStudio.myLevel',String(i))}catch(e){}paintStamp(i);applyMyLevel(i)},myLevel??3);
+showLevel(myLevel??3);paintStamp(myLevel);
+if(myLevel!=null)addEventListener('load',()=>setTimeout(()=>applyMyLevel(myLevel),400));
 
 /* vocabulary */
 /* vocabulary: full HSK 3.0 list, loaded from vocab.json */
