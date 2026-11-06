@@ -56,11 +56,12 @@ function contourFeatures(c){
   const start=medianOf(x.slice(0,q)),end=medianOf(x.slice(m-q));
   let minV=Infinity,minI=0,maxV=-Infinity;x.forEach((v,i)=>{if(v<minV){minV=v;minI=i}if(v>maxV)maxV=v});
   // a 4th tone often holds high and drops only in its last frames: look at the untrimmed tail too
-  const tail=c.slice(Math.floor(n*0.75));const tailMin=tail.length?Math.min(...tail):end;
+  // ignore the last two frames and any sudden collapse there: voices often go creaky as they stop, which fools pitch tracking
+  const tail=c.slice(Math.floor(n*0.7),Math.max(Math.floor(n*0.7)+1,n-2)).filter(v=>v>start-TAIL_JUMP);const tailMin=tail.length?Math.min(...tail):end;
   const preMax=Math.max(...x.slice(0,minI+1));   // highest point before the low point: how far the voice fell first
   return {start,end,minV,maxV,minPos:minI/(m-1||1),delta:end-start,dip:Math.min(start,end)-minV,fall:preMax-minV,rise:end-minV,tailMin,mean:x.reduce((a,b)=>a+b,0)/m,curve:x};
 }
-let FALL_K=0.8,RISE_K=1.2,FALL_S=1.5,RISE_S=2.5;
+let FALL_K=0.8,RISE_K=1.2,FALL_S=1.5,RISE_S=2.5,FALL4=0.45,TAIL_JUMP=2.5;
 function classifyTone(chao,semi,known){
   // chao: curve on the speaker's 1–5 scale (may run past 5); semi: the same curve in semitones; known: is the speaker's range reliable?
   if(chao.length<4)return {tone:0};
@@ -68,7 +69,7 @@ function classifyTone(chao,semi,known){
   if(known){
     // tuned on recorded native speech: 1st ≈ 55, 2nd ≈ 2→3 (may sag first), 3rd ≈ low, dipping, little rise unless word-final, 4th ≈ 5→2
     if(f.start>=3.4){
-      if(f.delta<=-0.6||f.tailMin<=f.start-1.2)tone=4;
+      if(f.delta<=-FALL4||f.tailMin<=f.start-1.2)tone=4;
       else tone=(f.delta>=0.8&&f.minPos<0.35)?2:1;
     }
     else if(f.minPos>=0.3&&f.fall>=FALL_K&&f.rise>=RISE_K)tone=3;   // full dipping-rising 214: falls first, then rises well above its low point

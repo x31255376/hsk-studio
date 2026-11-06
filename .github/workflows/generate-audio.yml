@@ -37,6 +37,7 @@ jobs:
       - name: Check tones of single-character clips
         if: always()
         run: |
+          sudo apt-get install -y -qq ffmpeg >/dev/null || true
           node tools/tone_check.js || true
           git add tools/tone_report.md || true
           git diff --cached --quiet || (git commit -q -m "Update tone report" && (git push -q || (git pull -q --rebase && git push -q)))
