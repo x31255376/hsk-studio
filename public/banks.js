@@ -381,5 +381,20 @@ function buildPron(VOCAB){
   return {pairs,sandhi};
 }
 
+/* ================= HSK 5–6 ADDITIONS (hand-written, from adv.js) ================= */
+if(window.HSK_ADV){const A=window.HSK_ADV;
+  // HSK 6 listening part 1: hear a passage, choose the statement that matches it (options are printed, not read)
+  A.listen.forEach(x=>listening.push({lvl:6,type:'True statement',lines:[['Q',x.t]],qs:[{q:'下面哪一项与录音内容一致？',qEn:'Which statement matches the recording?',opts:x.opts,en:null,ans:x.ans,why:`The recording says “${x.clue}”.`,read:false}]}));
+  // HSK 6 listening part 2: interviews with five questions each (questions are read aloud, as in the exam)
+  A.interviews.forEach(v=>listening.push({lvl:6,type:'Interview',title:v.title,lines:v.lines,qs:v.qs.map(q=>({q:q.q,qEn:'',opts:q.opts,en:null,ans:q.ans,why:`In the interview: “${q.clue}”.`}))}));
+  // HSK 3–4 true or false with three-sentence texts
+  A.judge.forEach((j,i)=>listening.push({lvl:j.lvl,type:'True or false',lines:[[i%2?'W':'M',j.t]],qs:[{q:'★ '+j.claim,qEn:'True or false?',opts:['对','错'],en:['true','false'],ans:j.truth?0:1,why:j.why,read:false}]}));
+  // HSKK: more prompts, read-aloud passages and retelling passages
+  const have=new Set(sp.map(x=>x.lvl+'|'+x.mode+'|'+x.text));const addA=(lvl,mode,text,en)=>{const k=lvl+'|'+mode+'|'+text;if(have.has(k))return;have.add(k);add(lvl,mode,text,en)};
+  A.speaking.forEach(x=>addA(x.lvl,x.mode,x.text,x.en));
+  A.reading.forEach(r=>addA('Advanced','read',r.t,'Read the passage aloud clearly and at a natural speed.'));
+  A.listen.forEach(r=>addA('Advanced','retell',r.t,'Listen, then retell the passage in your own words.'));
+}
+
 window.HSK_BANKS={listening,speaking:sp,buildPron};
 })();

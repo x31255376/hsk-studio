@@ -60,6 +60,7 @@ section{padding-block:44px;border-bottom:1px solid var(--line);display:grid;gap:
 .seg{display:flex;gap:6px;flex-wrap:wrap}
 .seg button{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
 .seg button[aria-pressed="true"]{background:var(--jade);border-color:var(--jade);color:var(--surface)}
+.seg-sub{margin-top:8px}.seg-sub button{padding:5px 11px;font-size:.85rem}.seg-sub button .note{color:inherit;opacity:.75;margin-left:2px}
 
 .lvl{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
 @media (max-width:700px){.lvl{grid-template-columns:1fr}}
@@ -226,6 +227,9 @@ select.search{appearance:auto}
 .rw-part .han{font-size:1.1rem;line-height:1.7;font-weight:400}
 .rw-part.used,.chip-btn.used{opacity:.4}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
+.rw-list{margin:0;padding-left:1.6em;display:grid;gap:4px;font-size:1.05rem}
+.letters-only{display:flex;flex-wrap:wrap;gap:8px}.letters-only .lopt{min-width:52px;justify-content:center}
+.rw-title{font-weight:600;text-align:center}
 .chip-btn{font-size:1.25rem;padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
 .rw-answer{min-height:1.8em;margin:0;font-size:1.3rem;border-bottom:2px dashed var(--line);padding-bottom:4px}
 .gap{padding:0 6px;border-bottom:2px solid var(--jade);margin:0 4px}
@@ -322,8 +326,9 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
   <section id="listening">
     <div class="eyebrow">Listening · the largest part of the HSK</div>
     <h2>Listening practice</h2>
-    <p class="lede">A bank of more than 300 questions across HSK 1–6: short dialogues, conversations, passages and true-or-false items. Play the audio, answer, then read the transcript and the explanation. Shuffle to drill in a new order.</p>
+    <p class="lede">A bank of more than 1,000 questions across HSK 1–6: short dialogues, conversations, passages, true-or-false items, and the HSK 6 tasks “choose the true statement” and interviews. Play the audio, answer, then read the transcript and the explanation. Shuffle to drill in a new order.</p>
     <div class="seg" id="lsSeg" role="group" aria-label="Listening level"></div>
+    <div class="seg seg-sub" id="lsType" role="group" aria-label="Question type"></div>
     <div class="panel lpanel">
       <div id="lsHead"></div>
       <div class="toolbar"><button class="btn" id="lsPlay" type="button">▶ Play audio</button><button class="btn ghost" id="lsTBtn" type="button">Show transcript</button><span class="note" id="lsPlays"></span></div>
@@ -336,7 +341,7 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
   <section id="reading">
     <div class="eyebrow">Reading</div>
     <h2>Reading practice</h2>
-    <p class="lede">Thousands of items in the formats of the HSK reading paper: recognise words, match questions and replies, fill the gap, judge true or false, put sentences in order, and answer questions on short texts. Built from this site’s word list and texts.</p>
+    <p class="lede">Thousands of items in the formats of the HSK reading paper: recognise words, match questions and replies, fill the gap, judge true or false, put sentences in order, answer questions on short texts, and the HSK 5–6 tasks: passage gaps, which statement is true, putting clauses back into a text, and finding the faulty sentence.</p>
     <div class="seg" id="rdLvl" role="group" aria-label="Reading practice level"></div>
     <div class="seg" id="rdMode" role="group" aria-label="Reading practice task"></div>
     <div class="panel quiz rw-card">
@@ -350,7 +355,7 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
   <section id="writing">
     <div class="eyebrow">Writing</div>
     <h2>Writing practice</h2>
-    <p class="lede">The HSK writing tasks from level 3 up: build a sentence from pieces, type characters from pinyin, write a sentence with a given word, and write a short text with five given words. Sentences are checked automatically; free writing shows a model to compare with.</p>
+    <p class="lede">The HSK writing tasks from level 3 up: build a sentence from pieces, type characters from pinyin, write a sentence with a given word, write a short text with five given words, and summarise a story (HSK 6). Sentences are checked automatically; free writing shows a model to compare with.</p>
     <div class="seg" id="wrLvl" role="group" aria-label="Writing practice level"></div>
     <div class="seg" id="wrMode" role="group" aria-label="Writing practice task"></div>
     <div class="panel quiz rw-card">
@@ -734,6 +739,7 @@ $('#rules').innerHTML=RULES.map(r=>`<div class="rule"><div><div class="ex">${r[0
 $('#rules').addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(b)speak(b.dataset.say,0.65)});
 </script>
 <script src="tone.js"></script>
+<script src="adv.js"></script>
 <script src="banks.js"></script>
 <script src="features.js"></script>
 <script src="rw.js"></script>

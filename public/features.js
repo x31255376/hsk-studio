@@ -182,18 +182,23 @@ const LISTEN=[
 ];
 LISTEN.push(...(window.HSK_BANKS?HSK_BANKS.listening:[]));
 LISTEN.forEach(it=>{it.id='L'+HSKAudio.fnv(it.lines.map(l=>l[1]).join('|')+'|'+it.qs[0].q).slice(0,10)});
-const LS={lvl:1,plays:0,showT:false,answers:{},decks:{}};
-function lsDeck(){return LS.decks[LS.lvl]||(LS.decks[LS.lvl]=Deck('listen-'+LS.lvl,LISTEN.filter(x=>x.lvl===LS.lvl)))}
+const LS={lvl:1,type:'',plays:0,showT:false,answers:{},decks:{}};
+function lsDeck(){const k=LS.lvl+(LS.type?'-'+LS.type:'');return LS.decks[k]||(LS.decks[k]=Deck('listen-'+k,LISTEN.filter(x=>x.lvl===LS.lvl&&(!LS.type||x.type===LS.type))))}
+// part filter: only shown when a level has more than one kind of question
+function lsTypes(){const el=$('#lsType');const types=[...new Set(LISTEN.filter(x=>x.lvl===LS.lvl).map(x=>x.type))];const fresh=el.cloneNode(false);el.replaceWith(fresh);
+  if(types.length<2){LS.type='';fresh.hidden=true;return}fresh.hidden=false;if(!types.includes(LS.type))LS.type='';
+  const n=t=>LISTEN.filter(x=>x.lvl===LS.lvl&&(!t||x.type===t)).length;const list=['',...types];
+  seg(fresh,list.map(t=>`${t||'All parts'} <span class="note">${n(t)}</span>`),i=>{LS.type=list[i];lsRender();$('#lsPlay').textContent='▶ Play audio'},list.indexOf(LS.type))}
 function lsRender(){
   stopAudio();const dk=lsDeck(),it=dk.cur();LS.plays=0;LS.showT=false;$('#lsPos').textContent=dk.label();
   const wrongMark=id=>H.data.listen.wrong[id]?' <span class="chip warn-chip">in your mistake book</span>':'';
   $('#lsHead').innerHTML=`<span class="eyebrow">HSK ${it.lvl} · ${esc(it.type)}</span>${wrongMark(it.id)}`;
   $('#lsPlays').textContent='';
   $('#lsTranscript').hidden=true;
-  $('#lsTranscript').innerHTML=it.lines.map(([w,t])=>`<p><b>${w==='W'?'Woman':w==='M'?'Man':'Speaker'}:</b> <span class="han">${esc(t)}</span></p>`).join('');
+  $('#lsTranscript').innerHTML=(it.title?`<p class="eyebrow">${esc(it.title)}</p>`:'')+it.lines.map(([w,t])=>`<p><b>${w==='W'?'Woman':w==='M'?'Man':'Speaker'}:</b> <span class="han">${esc(t)}</span></p>`).join('');
   $('#lsTBtn').textContent='Show transcript';
   $('#lsQs').innerHTML=it.qs.map((q,qi)=>`<div class="lq" data-qi="${qi}">
-      <p class="lq-q"><span class="han">${it.qs.length>1?(qi+1)+'. ':''}${esc(q.q)}</span> <span class="note">${esc(q.qEn)}</span></p>
+      <p class="lq-q"><span class="han">${it.qs.length>1?(qi+1)+'. ':''}${esc(q.q)}</span> ${q.qEn?` <span class="note">${esc(q.qEn)}</span>`:''}</p>
       <div class="lopts">${q.opts.map((o,oi)=>`<button class="choice lopt" type="button" data-oi="${oi}"><span class="letter">${'ABCD'[oi]}</span><span class="han">${esc(o)}</span></button>`).join('')}</div>
       <p class="lwhy" hidden></p></div>`).join('');
   const done=LS.answers[it.id];if(done)done.forEach((oi,qi)=>{if(oi!=null)lsMark(it,qi,oi,false)});
@@ -201,7 +206,7 @@ function lsRender(){
 function lsMark(it,qi,oi,record){
   const q=it.qs[qi],box=$(`#lsQs .lq[data-qi="${qi}"]`);const ok=oi===q.ans;
   box.querySelectorAll('.lopt').forEach((b,i)=>{b.disabled=true;if(i===q.ans)b.classList.add('right');else if(i===oi)b.classList.add('wrong');
-    b.insertAdjacentHTML('beforeend',`<span class="note opt-en">${esc(q.en[i])}</span>`)});
+    if(q.en&&q.en[i])b.insertAdjacentHTML('beforeend',`<span class="note opt-en">${esc(q.en[i])}</span>`)});
   const why=box.querySelector('.lwhy');why.hidden=false;why.innerHTML=`<span class="verdict ${ok?'good':'bad'}">${ok?'Correct':'Answer: '+'ABCD'[q.ans]}</span> ${esc(q.why)}`;
   if(record){(LS.answers[it.id]||(LS.answers[it.id]=[]))[qi]=oi;
     const all=it.qs.every((_,k)=>LS.answers[it.id][k]!=null);
@@ -216,7 +221,7 @@ async function lsPlay(){
   $('#lsPlay').disabled=false;$('#lsPlay').textContent='▶ Play again';
 }
 function initListening(){
-  seg($('#lsSeg'),[1,2,3,4,5,6].map(n=>'HSK '+n),i=>{LS.lvl=i+1;lsRender();$('#lsPlay').textContent='▶ Play audio'},0);
+  seg($('#lsSeg'),[1,2,3,4,5,6].map(n=>'HSK '+n),i=>{LS.lvl=i+1;LS.type='';lsTypes();lsRender();$('#lsPlay').textContent='▶ Play audio'},0);lsTypes();
   $('#lsPlay').onclick=lsPlay;
   $('#lsTBtn').onclick=()=>{const t=$('#lsTranscript');t.hidden=!t.hidden;$('#lsTBtn').textContent=t.hidden?'Show transcript':'Hide transcript'};
   $('#lsPrev').onclick=()=>{lsDeck().prev();lsRender();$('#lsPlay').textContent='▶ Play audio'};
@@ -226,7 +231,7 @@ function initListening(){
     const qi=+b.closest('.lq').dataset.qi;lsMark(it,qi,+b.dataset.oi,true)});
   lsRender();
 }
-function openListening(id){const it=LISTEN.find(x=>x.id===id);if(!it)return;LS.lvl=it.lvl;lsDeck().goTo(it);delete LS.answers[id];
+function openListening(id){const it=LISTEN.find(x=>x.id===id);if(!it)return;LS.lvl=it.lvl;LS.type='';lsTypes();lsDeck().goTo(it);delete LS.answers[id];
   $('#lsSeg').querySelectorAll('button').forEach((b,i)=>b.setAttribute('aria-pressed',i===it.lvl-1));lsRender();$('#listening').scrollIntoView({behavior:'smooth'})}
 
 /* ================= VOCAB: known / review ================= */

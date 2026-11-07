@@ -1,0 +1,237 @@
+# HSKK additions: level | mode | text | English
+Beginner|answer|你今天早上吃了什么？|What did you eat this morning?
+Beginner|answer|你喜欢喝茶还是喝咖啡？|Do you prefer tea or coffee?
+Beginner|answer|你的生日是几月几号？|When is your birthday?
+Beginner|answer|你家离学校远吗？|Is your home far from school?
+Beginner|answer|你有哥哥或者姐姐吗？|Do you have an older brother or sister?
+Beginner|answer|你昨天晚上几点睡觉的？|What time did you go to bed last night?
+Beginner|answer|你喜欢什么颜色？|What colour do you like?
+Beginner|answer|你今天穿的衣服是什么颜色的？|What colour are your clothes today?
+Beginner|answer|你会说几种语言？|How many languages can you speak?
+Beginner|answer|你周末一般几点起床？|What time do you usually get up at the weekend?
+Beginner|answer|你喜欢夏天还是冬天？|Do you prefer summer or winter?
+Beginner|answer|你今天是怎么来的？|How did you get here today?
+Beginner|talk|你最喜欢的季节是什么？为什么？|What is your favourite season, and why?
+Beginner|talk|请介绍一下你的一个好朋友。|Describe a good friend of yours.
+Beginner|talk|你喜欢吃什么菜？请说一说。|What food do you like? Talk about it.
+Beginner|talk|你每天早上一般做什么？|What do you usually do in the morning?
+Beginner|talk|请介绍一下你的家。|Describe your home.
+Beginner|talk|你最喜欢的运动是什么？为什么？|What is your favourite sport, and why?
+Beginner|talk|你为什么学习汉语？|Why are you learning Chinese?
+Beginner|talk|请说说你昨天做了什么。|Tell me what you did yesterday.
+Beginner|talk|你喜欢看电影吗？请说说你喜欢的电影。|Do you like films? Talk about one you like.
+Beginner|talk|你最喜欢的动物是什么？为什么？|What is your favourite animal, and why?
+Beginner|talk|请介绍一下你的学校或者公司。|Describe your school or workplace.
+Beginner|talk|你生日的时候一般怎么过？|How do you usually spend your birthday?
+Beginner|talk|你喜欢去哪儿旅游？为什么？|Where do you like to travel, and why?
+Beginner|talk|请说说你的爸爸或者妈妈。|Talk about your father or mother.
+Beginner|talk|你平时喜欢听什么音乐？|What music do you usually listen to?
+Beginner|talk|你最喜欢一个星期里的哪一天？为什么？|Which day of the week do you like best, and why?
+Beginner|talk|你喜欢一个人吃饭还是和朋友一起吃饭？|Do you prefer eating alone or with friends?
+Beginner|talk|请说说你最近买的一件东西。|Talk about something you bought recently.
+Beginner|talk|你住的城市怎么样？请说一说。|What is the city you live in like?
+Beginner|talk|你喜欢下雨天吗？为什么？|Do you like rainy days? Why?
+Beginner|talk|你的汉语老师是什么样的人？|What is your Chinese teacher like?
+Beginner|talk|你喜欢早起还是晚起？为什么？|Do you prefer getting up early or late?
+Beginner|talk|你常常用手机做什么？|What do you often use your phone for?
+Beginner|talk|请说说你最喜欢的一个饭馆。|Talk about your favourite restaurant.
+Beginner|talk|你喜欢什么样的天气？|What kind of weather do you like?
+Beginner|talk|你小时候喜欢玩什么？|What did you like to play as a child?
+Beginner|talk|你一般在哪儿买衣服？|Where do you usually buy clothes?
+Beginner|talk|你喜欢做饭吗？你会做什么菜？|Do you like cooking? What can you make?
+Beginner|talk|请说说你的周末计划。|Talk about your plans for the weekend.
+Beginner|talk|你的房间里有什么？|What is in your room?
+Beginner|talk|你喜欢什么水果？为什么？|What fruit do you like, and why?
+Beginner|talk|你最想去中国的哪个城市？为什么？|Which Chinese city would you most like to visit?
+Beginner|talk|你觉得学汉语难吗？为什么？|Is Chinese hard to learn? Why?
+Beginner|talk|你喜欢养小动物吗？为什么？|Do you like keeping pets? Why?
+Beginner|talk|你每天怎么去上课或者上班？|How do you get to class or work every day?
+Beginner|talk|请说说你最喜欢的一本书。|Talk about your favourite book.
+Beginner|talk|你一般什么时候运动？|When do you usually exercise?
+Beginner|talk|你喜欢喝什么？为什么？|What do you like to drink, and why?
+Beginner|talk|你和朋友见面的时候一般做什么？|What do you do when you meet friends?
+Beginner|talk|你喜欢热闹的地方还是安静的地方？|Do you prefer lively or quiet places?
+Beginner|talk|你最近一次去医院是什么时候？|When did you last go to a hospital?
+Beginner|talk|请说说你今天的天气。|Describe today’s weather.
+Beginner|talk|你喜欢坐火车还是坐飞机？为什么？|Do you prefer trains or planes? Why?
+Beginner|talk|你家附近有什么？|What is near your home?
+Beginner|talk|你最喜欢的节日是什么？|What is your favourite festival?
+Beginner|talk|你喜欢什么样的朋友？|What kind of friends do you like?
+Beginner|talk|你上一次旅游去了哪儿？|Where did you go on your last trip?
+Beginner|talk|你一天喝多少水？|How much water do you drink a day?
+Beginner|talk|你喜欢看书还是看电视？为什么？|Do you prefer reading or watching TV?
+Beginner|talk|你晚上一般几点睡觉？睡觉前做什么？|When do you go to bed, and what do you do before?
+Beginner|talk|你觉得你的家人最喜欢做什么？|What does your family like to do most?
+Beginner|talk|你最喜欢的老师是谁？为什么？|Who is your favourite teacher, and why?
+Beginner|talk|请说说你会做的一件事。|Talk about something you can do well.
+Beginner|talk|你喜欢冬天吗？冬天你常做什么？|Do you like winter? What do you do then?
+Beginner|talk|你觉得什么东西最重要？为什么？|What thing is most important to you, and why?
+Beginner|talk|你喜欢去商店买东西还是在网上买？|Do you prefer shopping in stores or online?
+Beginner|talk|请介绍一下你的一个邻居。|Describe one of your neighbours.
+Beginner|talk|你喜欢唱歌吗？你会唱中文歌吗？|Do you like singing? Can you sing a Chinese song?
+Beginner|talk|你觉得你自己是一个什么样的人？|What kind of person are you?
+Beginner|talk|你最喜欢的颜色是什么？为什么？|What is your favourite colour, and why?
+Intermediate|picture|几个年轻人在海边打排球，旁边有人在晒太阳。|Picture: young people playing volleyball on a beach while others sunbathe.
+Intermediate|picture|一个男孩在厨房里帮妈妈洗碗。|Picture: a boy helping his mother wash dishes in the kitchen.
+Intermediate|picture|下大雪了，几个孩子在外面堆雪人。|Picture: heavy snow, children building a snowman outside.
+Intermediate|picture|一位医生在给一个小女孩检查身体，女孩看起来有点儿害怕。|Picture: a doctor examining a little girl who looks a bit scared.
+Intermediate|picture|地铁里人很多，一个年轻人给一位老人让座。|Picture: a crowded subway, a young person gives up a seat to an old man.
+Intermediate|picture|一家人围着桌子吃年夜饭，桌子上有很多菜。|Picture: a family around a table full of dishes for New Year’s Eve dinner.
+Intermediate|picture|一个女孩在房间里弹钢琴，一只猫坐在钢琴上。|Picture: a girl playing piano in her room, a cat sitting on the piano.
+Intermediate|picture|一个男人在路边修汽车，脸上都是汗。|Picture: a man repairing his car at the roadside, sweating.
+Intermediate|picture|几个同学在教室里讨论问题，老师站在旁边听。|Picture: classmates discussing a question, the teacher listening nearby.
+Intermediate|picture|一位老奶奶在公园里喂鸽子，很多鸽子围着她。|Picture: an old woman feeding pigeons in a park.
+Intermediate|picture|一对年轻夫妻在商店里挑选沙发。|Picture: a young couple choosing a sofa in a shop.
+Intermediate|picture|一个快递员在门口送包裹，一个人正在开门。|Picture: a courier delivering a parcel as someone opens the door.
+Intermediate|picture|一个孩子在生日聚会上吹蜡烛，朋友们在拍手。|Picture: a child blowing out birthday candles while friends clap.
+Intermediate|picture|一个女人在办公室里打电话，桌子上有很多文件。|Picture: a woman on the phone in an office with lots of papers on the desk.
+Intermediate|picture|雨天，一个男孩把自己的伞给了一个没带伞的女孩。|Picture: on a rainy day, a boy gives his umbrella to a girl who has none.
+Intermediate|picture|几个人在山顶上拍照，后面是很美的风景。|Picture: people taking photos on a mountain top with a beautiful view.
+Intermediate|picture|一个年轻人在图书馆里睡着了，书掉在了地上。|Picture: a young person asleep in a library, a book fallen on the floor.
+Intermediate|picture|一位爸爸在教儿子骑自行车。|Picture: a father teaching his son to ride a bike.
+Intermediate|picture|超市里排着很长的队，一个人看起来很着急。|Picture: a long queue at a supermarket, one person looks impatient.
+Intermediate|picture|一个女孩在机场和家人告别，妈妈在擦眼泪。|Picture: a girl saying goodbye to her family at the airport, her mother wiping tears.
+Intermediate|picture|几个人在河边钓鱼，其中一个人钓到了一条大鱼。|Picture: people fishing by a river, one has caught a big fish.
+Intermediate|picture|一个厨师在饭馆的厨房里做菜，火很大。|Picture: a chef cooking over a big flame in a restaurant kitchen.
+Intermediate|picture|一个学生在考试，看起来很紧张。|Picture: a student taking an exam, looking nervous.
+Intermediate|picture|一个人在家里打扫卫生，地上有很多东西。|Picture: someone cleaning at home with things all over the floor.
+Intermediate|picture|几个朋友在饭馆里给一个人过生日，桌上有一个大蛋糕。|Picture: friends celebrating a birthday in a restaurant with a big cake.
+Intermediate|picture|一个老人在路边下棋，旁边站着很多人在看。|Picture: an old man playing chess by the road, a crowd watching.
+Intermediate|picture|一只狗把主人的鞋咬坏了，主人很生气。|Picture: a dog has chewed its owner’s shoe and the owner is angry.
+Intermediate|picture|一个女孩在花店里买花，店员正在包花。|Picture: a girl buying flowers while the florist wraps them.
+Intermediate|picture|一个男人在火车站跑着赶火车，手里拿着行李。|Picture: a man running with luggage to catch a train.
+Intermediate|picture|几个孩子在游泳池里玩，一个救生员在旁边看着。|Picture: children playing in a pool, a lifeguard watching.
+Intermediate|picture|一家人在公园里野餐，草地上放着很多吃的。|Picture: a family picnic in the park with food on the grass.
+Intermediate|picture|一个年轻人在面试，对面坐着两位面试官。|Picture: a young person at a job interview facing two interviewers.
+Intermediate|picture|一个女人在电脑前工作，旁边放着一杯咖啡，窗外已经天黑了。|Picture: a woman working at a computer late at night with a cup of coffee.
+Intermediate|picture|几个志愿者在街上捡垃圾。|Picture: volunteers picking up litter in the street.
+Intermediate|picture|一个孩子摔倒了，在哭，一个阿姨正在扶他起来。|Picture: a child has fallen and is crying; a woman helps him up.
+Intermediate|picture|一对老夫妻手拉着手在湖边散步。|Picture: an elderly couple walking hand in hand by a lake.
+Intermediate|picture|一个人在商店里试衣服，看着镜子不太满意。|Picture: someone trying on clothes, unhappy with the mirror.
+Intermediate|picture|几个年轻人在音乐会上跟着音乐跳舞。|Picture: young people dancing at a concert.
+Intermediate|picture|一个司机在出租车里等客人，外面正在下雨。|Picture: a taxi driver waiting for passengers in the rain.
+Intermediate|picture|一位老师在黑板上写汉字，学生们在认真地记笔记。|Picture: a teacher writing characters on the board as students take notes.
+Intermediate|picture|一个男孩在床上玩手机，妈妈站在门口，看起来很生气。|Picture: a boy on his phone in bed, his mother angry at the door.
+Intermediate|picture|一家咖啡馆里，几个人在用电脑工作。|Picture: people working on laptops in a café.
+Intermediate|picture|一个女孩在路边帮一位老人过马路。|Picture: a girl helping an old man cross the road.
+Intermediate|picture|几个工人正在盖一座高楼。|Picture: workers building a tall building.
+Intermediate|picture|一个人在家里做饭，锅里冒出了很多烟。|Picture: someone cooking at home with smoke pouring from the pan.
+Intermediate|picture|一个运动员跑过终点，举起了双手。|Picture: a runner crossing the finish line with arms raised.
+Intermediate|picture|一个小女孩在给花浇水，花园里开满了花。|Picture: a little girl watering flowers in a garden in bloom.
+Intermediate|picture|几个人在火锅店里吃火锅，大家吃得很开心。|Picture: friends happily eating hot pot.
+Intermediate|picture|一个人站在公共汽车站，看着手表，好像等了很久。|Picture: someone at a bus stop checking the time as if waiting a long time.
+Intermediate|picture|一个男人在银行里排队办事，手里拿着一张表。|Picture: a man queuing at a bank holding a form.
+Intermediate|picture|几个学生在操场上踢足球，天快黑了。|Picture: students playing football as it gets dark.
+Intermediate|picture|一个女孩在宿舍里收拾行李，准备回家过年。|Picture: a girl packing in her dorm to go home for the New Year.
+Intermediate|picture|一个年轻人在帮邻居搬家具。|Picture: a young person helping a neighbour move furniture.
+Intermediate|picture|一个孩子在动物园里看熊猫，熊猫正在吃竹子。|Picture: a child watching a panda eat bamboo at the zoo.
+Intermediate|picture|一个男人在家里修电脑，桌子上放着很多工具。|Picture: a man fixing a computer at home with tools on the table.
+Intermediate|talk|你觉得什么样的工作是好工作？|What makes a good job?
+Intermediate|talk|请谈谈你小时候的一个梦想。|Talk about a childhood dream.
+Intermediate|talk|你认为朋友之间最重要的是什么？|What matters most between friends?
+Intermediate|talk|你喜欢在大公司工作还是小公司？为什么？|Big company or small company, and why?
+Intermediate|talk|请谈谈你学汉语的经历。|Talk about your experience learning Chinese.
+Intermediate|talk|你觉得孩子应该从几岁开始用手机？|At what age should children start using phones?
+Intermediate|talk|你怎么看待加班？|What do you think about working overtime?
+Intermediate|talk|请介绍一个你们国家的传统节日。|Describe a traditional festival from your country.
+Intermediate|talk|你觉得住在大城市有什么好处和坏处？|Pros and cons of living in a big city?
+Intermediate|talk|你平时怎么保持健康？|How do you stay healthy?
+Intermediate|talk|请谈谈你最喜欢的一部电影或者一本书。|Talk about a favourite film or book.
+Intermediate|talk|你觉得学生应该打工吗？为什么？|Should students take part-time jobs?
+Intermediate|talk|请谈谈一次让你很开心的经历。|Describe an experience that made you very happy.
+Intermediate|talk|你觉得网上交朋友安全吗？|Is making friends online safe?
+Intermediate|talk|如果你有一个月的假期，你想做什么？|What would you do with a month’s holiday?
+Intermediate|talk|你觉得父母应该怎么教育孩子？|How should parents bring up children?
+Intermediate|talk|请谈谈你们国家的饮食习惯。|Talk about eating habits in your country.
+Intermediate|talk|你觉得旅游最重要的是什么？|What matters most when travelling?
+Intermediate|talk|你更喜欢自己做饭还是去饭馆吃？为什么？|Cook at home or eat out, and why?
+Intermediate|talk|请谈谈你遇到过的一个困难，你是怎么解决的。|Describe a difficulty you faced and how you solved it.
+Intermediate|talk|你觉得男人和女人做家务应该一样多吗？|Should men and women share housework equally?
+Intermediate|talk|你怎么看待网上购物？|What do you think of online shopping?
+Intermediate|talk|你觉得什么样的老师是好老师？|What makes a good teacher?
+Intermediate|talk|请谈谈你最喜欢的一种运动。|Talk about a sport you like.
+Intermediate|talk|你觉得养宠物有什么好处？|What are the benefits of keeping pets?
+Intermediate|talk|你喜欢一个人住还是和别人一起住？|Do you prefer living alone or with others?
+Intermediate|talk|你觉得手机对我们的生活有什么影响？|How do phones affect our lives?
+Intermediate|talk|请介绍一下你的家乡。|Describe your hometown.
+Intermediate|talk|你觉得钱能买到幸福吗？|Can money buy happiness?
+Intermediate|talk|你周末一般怎么放松？|How do you relax at the weekend?
+Intermediate|talk|你认为学习外语最好的方法是什么？|What is the best way to learn a foreign language?
+Intermediate|talk|你觉得环境保护和每个人有关系吗？|Is environmental protection everyone’s business?
+Intermediate|talk|请谈谈你对“早睡早起”的看法。|What do you think of “early to bed, early to rise”?
+Intermediate|talk|你觉得什么样的生活最幸福？|What kind of life is happiest?
+Intermediate|talk|请谈谈你和家人一起做过的一件难忘的事。|Describe a memorable thing you did with your family.
+Intermediate|talk|你喜欢旅游时跟团还是自己安排？为什么？|Group tour or independent travel, and why?
+Intermediate|talk|你觉得年轻人应该早点儿结婚吗？|Should young people marry early?
+Intermediate|talk|你认为成功最需要什么？|What does success need most?
+Intermediate|talk|请谈谈你最近学会的一件新事情。|Talk about something new you learned recently.
+Intermediate|talk|你觉得在家工作好不好？为什么？|Is working from home good? Why?
+Advanced|talk|有人说“读万卷书不如行万里路”，你同意吗？|“Travel teaches more than books.” Do you agree?
+Advanced|talk|你认为网络让人变得更孤独了吗？|Has the internet made people lonelier?
+Advanced|talk|你怎么看待“断舍离”的生活方式？|What do you think of minimalism (断舍离)?
+Advanced|talk|你认为年轻人应该在大城市打拼还是回家乡发展？|Should young people strive in big cities or go home?
+Advanced|talk|有人认为考试不能反映真正的能力，你怎么看？|Some say exams don’t show real ability. Your view?
+Advanced|talk|你认为传统文化在现代社会还有什么价值？|What value does traditional culture still have today?
+Advanced|talk|你怎么看待“内卷”这个现象？|What do you think of “involution” (内卷)?
+Advanced|talk|你认为一个人的性格是天生的还是后天形成的？|Is personality inborn or shaped later?
+Advanced|talk|你认为社交媒体对青少年有什么影响？|How does social media affect teenagers?
+Advanced|talk|有人说“金钱不是万能的，但没有钱是万万不能的”，你怎么理解？|“Money isn’t everything, but without it nothing works.” Discuss.
+Advanced|talk|你怎么看待人们越来越依赖外卖的现象？|What do you think of people relying more and more on food delivery?
+Advanced|talk|你认为父母应该为孩子规划人生吗？|Should parents plan their children’s lives?
+Advanced|talk|你认为一个城市最重要的是什么？|What matters most in a city?
+Advanced|talk|你认为工作和生活应该怎样平衡？|How should work and life be balanced?
+Advanced|talk|有人说“兴趣是最好的老师”，你同意吗？|“Interest is the best teacher.” Do you agree?
+Advanced|talk|你怎么看待“网红经济”？|What do you think of the influencer economy?
+Advanced|talk|你认为保护动物和发展经济哪个更重要？|Which matters more: protecting wildlife or growing the economy?
+Advanced|talk|你认为成功的标准是什么？|What is the measure of success?
+Advanced|talk|你怎么看待老年人再就业的现象？|What do you think of older people returning to work?
+Advanced|talk|你认为人工智能会让人变得更懒吗？|Will AI make people lazier?
+Advanced|talk|你认为诚信在现代社会中重要吗？为什么？|Is honesty still important in modern society?
+Advanced|talk|有人说“失败比成功更能教会人东西”，你怎么看？|“Failure teaches more than success.” Your view?
+Advanced|talk|你认为学校应该取消家庭作业吗？|Should schools abolish homework?
+Advanced|talk|你怎么看待人们在网上发表评论时的不文明行为？|What do you think of rude behaviour in online comments?
+Advanced|talk|你认为选择职业时，兴趣和收入哪个更重要？|Interest or income: which matters more when choosing a career?
+Advanced|talk|你认为一个人应不应该一辈子只做一份工作？|Should a person stay in one job for life?
+Advanced|talk|你怎么看待“慢生活”？|What do you think of “slow living”?
+Advanced|talk|你认为城市应该限制汽车的数量吗？|Should cities limit the number of cars?
+Advanced|talk|你认为竞争对孩子的成长是好事还是坏事？|Is competition good or bad for children?
+Advanced|talk|有人说“距离产生美”，你同意吗？|“Distance makes the heart grow fonder.” Do you agree?
+Advanced|talk|你认为一个好的领导应该具备哪些能力？|What abilities should a good leader have?
+Advanced|talk|你怎么看待年轻人“月光”的消费习惯？|What do you think of young people spending their whole salary every month?
+Advanced|talk|你认为旅游业的发展对当地有什么影响？|How does tourism affect local places?
+Advanced|talk|你认为一个人独处的能力重要吗？|Is the ability to be alone important?
+Advanced|talk|你怎么看待“熟人社会”和“陌生人社会”的区别？|How do close-knit and anonymous societies differ?
+Advanced|talk|你认为学习历史有什么意义？|Why does studying history matter?
+Advanced|talk|你认为网络上的信息都可以相信吗？我们应该怎么判断？|Can online information be trusted? How should we judge it?
+Advanced|talk|你怎么看待现在很多人不愿意生孩子的现象？|What do you think of many people not wanting children?
+Advanced|talk|你认为环境保护应该靠政府还是靠个人？|Should protecting the environment rely on government or individuals?
+Advanced|talk|你认为幸福和财富之间有什么关系？|What is the relationship between happiness and wealth?
+Beginner|answer|你现在住在哪儿？|Where do you live now?
+Beginner|answer|你最喜欢吃什么水果？|What fruit do you like most?
+Beginner|answer|你今天几点起床的？|What time did you get up today?
+Beginner|answer|你喜欢打篮球吗？|Do you like playing basketball?
+Beginner|answer|你的手机是什么颜色的？|What colour is your phone?
+Beginner|answer|你每天喝几杯水？|How many glasses of water do you drink a day?
+Beginner|answer|你上个周末去哪儿了？|Where did you go last weekend?
+Beginner|answer|你家有几口人？|How many people are in your family?
+Beginner|talk|你喜欢吃中国菜吗？请说说为什么。|Do you like Chinese food? Say why.
+Beginner|talk|请介绍一下你的一天。|Describe your day.
+Beginner|talk|你最喜欢的衣服是什么样的？|What do your favourite clothes look like?
+Beginner|talk|你有什么爱好？请说一说。|What hobbies do you have?
+Beginner|talk|你喜欢你的工作或者学习吗？为什么？|Do you like your work or studies? Why?
+Beginner|talk|请说说你家附近的一个公园。|Talk about a park near your home.
+Intermediate|picture|一位妈妈在超市里推着购物车，孩子坐在车里吃饼干。|Picture: a mother pushing a shopping trolley with a child eating biscuits in it.
+Intermediate|picture|两个人在雨中跑步，衣服都湿了。|Picture: two people running in the rain, soaked.
+Intermediate|picture|一个学生在宿舍里一边吃方便面一边看书。|Picture: a student eating instant noodles while reading in the dorm.
+Intermediate|talk|你觉得一个好邻居应该是什么样的？|What makes a good neighbour?
+Intermediate|talk|请谈谈你最喜欢的一个季节和原因。|Talk about your favourite season and why.
+Intermediate|talk|你怎么安排自己的时间？|How do you manage your time?
+Intermediate|talk|你觉得学生穿校服好不好？|Is it good for students to wear uniforms?
+Intermediate|talk|请谈谈你第一次做饭的经历。|Describe the first time you cooked.
+Advanced|talk|你认为人们应该怎样面对压力？|How should people face stress?
+Advanced|talk|你怎么看待“活到老，学到老”这句话？|What do you think of “never too old to learn”?
+Advanced|talk|你认为科技进步一定会让生活更好吗？|Does technological progress always improve life?
+Advanced|talk|你认为家庭教育和学校教育哪个更重要？|Which matters more: family or school education?
+Advanced|talk|你怎么看待人们追求名牌的现象？|What do you think of people chasing luxury brands?
+Beginner|answer|你喜欢看电影吗？|Do you like watching films?
+Beginner|answer|你今天累不累？|Are you tired today?

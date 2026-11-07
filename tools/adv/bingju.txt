@@ -1,0 +1,143 @@
+# HSK 6 病句: faulty | corrected | why. Rows whose why starts with "(" are correct sentences (used as the three correct options).
+通过这次活动，使同学们认识到了保护环境的重要性。|通过这次活动，同学们认识到了保护环境的重要性。|No subject: 通过… and 使… together leave the sentence without a subject. Drop 使.
+经过大家的努力，使问题终于得到了解决。|经过大家的努力，问题终于得到了解决。|No subject: 经过… plus 使… removes the subject. Drop 使.
+在老师的帮助下，使我的成绩提高得很快。|在老师的帮助下，我的成绩提高得很快。|No subject: 在…下 plus 使 leaves nothing doing the action.
+由于他工作认真，使他得到了领导的表扬。|由于工作认真，他得到了领导的表扬。|使 with 由于… leaves the main clause without a proper subject.
+这座桥大约有五百米左右长。|这座桥大约有五百米长。|Repetition: 大约 and 左右 both mean “about”; use only one.
+会议大概进行了两个小时左右。|会议进行了两个小时左右。|Repetition: 大概 and 左右 both mean “approximately”.
+这位老人已经年过九十多岁了。|这位老人已经年过九十了。|Repetition: 年过九十 already means “over ninety”; 多岁 repeats it.
+他们凯旋而归，受到了热烈的欢迎。|他们凯旋，受到了热烈的欢迎。|Repetition: 旋 in 凯旋 already means “return”, so 而归 is redundant.
+我们一定要防止类似的事故不再发生。|我们一定要防止类似的事故再次发生。|Double negative: 防止 already means “prevent”; 不再 reverses the meaning.
+为了避免今后不再出现这样的错误，我们制定了新的规定。|为了避免今后再出现这样的错误，我们制定了新的规定。|Double negative: 避免 plus 不再 says the opposite of what is meant.
+谁也不能否认他不是一个好老师。|谁也不能否认他是一个好老师。|Three negatives (不能, 否认, 不是) turn the meaning upside down.
+难道你不能否认这是你的错吗？|难道你能否认这是你的错吗？|难道…不能否认 is a negative too many; the intended meaning needs 难道你能否认.
+能否坚持锻炼，是身体健康的重要保证。|坚持锻炼，是身体健康的重要保证。|Two sides vs one: 能否 (whether or not) cannot match the one-sided 保证.
+一个人能否成功，关键在于努力。|一个人能否成功，关键在于是否努力。|Two sides vs one: 能否成功 must be matched by 是否努力.
+能不能保持好心态，是考试成功的关键。|能不能保持好心态，是考试能否成功的关键。|Two sides vs one: 能不能 needs a two-sided partner such as 能否成功.
+他的写作水平有了很大的改善。|他的写作水平有了很大的提高。|Wrong collocation: 水平 goes with 提高, not 改善.
+我们要不断改进人民的生活水平。|我们要不断提高人民的生活水平。|Wrong collocation: 生活水平 is 提高, not 改进.
+这家工厂的产品质量有了明显的增加。|这家工厂的产品质量有了明显的提高。|Wrong collocation: 质量 is 提高; 增加 is for amounts.
+他养成了每天早上跑步的好办法。|他养成了每天早上跑步的好习惯。|Wrong collocation: 养成 goes with 习惯, not 办法.
+大家对这个问题发表了不同的意义。|大家对这个问题发表了不同的意见。|Wrong word: 发表意见 (give opinions); 意义 means “meaning”.
+图书馆里的书大部分是新书，种类也很丰富多样化。|图书馆里的书大部分是新书，种类也很丰富。|Repetition: 丰富 and 多样化 say the same thing.
+我们要及时解决并发现工作中的问题。|我们要及时发现并解决工作中的问题。|Wrong order: a problem is found before it is solved.
+会议讨论并通过了这项计划。|会议讨论并通过了这项计划。|(correct)
+同学们认真地听取并采纳了老师的建议。|同学们认真地听取并采纳了老师的建议。|(correct)
+我们要学习并掌握好这些知识。|我们要学习并掌握好这些知识。|(correct)
+他把作业交给老师以后，才开始认真地写起来。|他认真地写完作业以后，才交给了老师。|Illogical order: homework cannot be handed in before it is written.
+我们应该虚心学习别人的长处，改正自己的缺点也要。|我们应该虚心学习别人的长处，也要改正自己的缺点。|Wrong order: 也要 must come before the verb phrase.
+他昨天在图书馆认真地一个下午看书。|他昨天在图书馆认真地看了一个下午书。|Wrong order: the duration 一个下午 comes after the verb.
+我们班的同学都几乎参加了这次比赛。|我们班的同学几乎都参加了这次比赛。|Wrong order: 几乎 goes before 都.
+这本书我已经三遍看过了。|这本书我已经看过三遍了。|Wrong order: the number of times 三遍 follows the verb.
+他迟到的原因是因为路上堵车。|他迟到的原因是路上堵车。|Mixed structures: 原因是 and 因为 overlap; use one.
+这次失败的原因是由于准备不足造成的。|这次失败的原因是准备不足。|Mixed structures: 原因是, 由于 and 造成的 all say “cause”.
+他之所以成功，是因为他非常努力的结果。|他之所以成功，是因为他非常努力。|Mixed structures: 是因为… and …的结果 are two ways of saying the same thing.
+北京的秋天是一个美丽的地方。|北京的秋天是一个美丽的季节。|Subject and object do not match: autumn is a season, not a place.
+他的家乡是一个风景优美的季节。|他的家乡是一个风景优美的地方。|Subject and object do not match: a hometown is a place.
+这家商店的价格非常便宜。|这家商店的东西非常便宜。|Mismatch: things are cheap; a price is 低, not 便宜.
+今天的气温很热，大家都待在家里。|今天的气温很高，大家都待在家里。|Mismatch: temperature is 高 or 低, not 热.
+这个消息传开后，引起了大家的关心。|这个消息传开后，引起了大家的关注。|Wrong collocation: 引起关注 (attract attention).
+我们要发挥大家的积极，把工作做好。|我们要发挥大家的积极性，把工作做好。|Missing part: 发挥 needs a noun, 积极性 (enthusiasm).
+随着经济的发展，使人们的生活越来越好。|随着经济的发展，人们的生活越来越好。|No subject: 随着… plus 使 removes the subject. Drop 使.
+从这件事中，使我明白了一个道理。|这件事使我明白了一个道理。|No subject: 从…中 plus 使 leaves the sentence without a subject.
+他不但学习好，而且他的哥哥也学习好。|不但他学习好，而且他的哥哥也学习好。|Wrong position: with two different subjects, 不但 goes before the first subject.
+不但他会说英语，而且会说法语。|他不但会说英语，而且会说法语。|Wrong position: with one subject, 不但 goes after the subject.
+虽然天气很冷，所以我们还是去爬山了。|虽然天气很冷，但是我们还是去爬山了。|Wrong connective: 虽然 pairs with 但是, not 所以.
+因为他生病了，但是没有来上课。|因为他生病了，所以没有来上课。|Wrong connective: 因为 pairs with 所以.
+即使明天下大雨，我们才会去。|即使明天下大雨，我们也会去。|Wrong connective: 即使 pairs with 也.
+只要你努力，才能取得好成绩。|只有努力，才能取得好成绩。|Wrong connective: 只有 pairs with 才; 只要 pairs with 就.
+只有多练习，你的汉语就会进步。|只要多练习，你的汉语就会进步。|Wrong connective: 只要 pairs with 就.
+无论天气多么冷，他坚持每天跑步。|无论天气多么冷，他都坚持每天跑步。|Missing word: 无论 needs 都 in the main clause.
+他是我们班最优秀的学生之一的人。|他是我们班最优秀的学生之一。|Redundant ending: 之一 already ends the phrase; 的人 is extra.
+他是我见过的最认真的人之一。|他是我见过的最认真的人之一。|(correct)
+这个城市的人口比十年前增加了两倍多。|这个城市的人口比十年前增加了两倍多。|(correct)
+今年的产品价格比去年降低了一倍。|今年的产品价格比去年降低了一半。|Wrong number: a decrease cannot be expressed with 倍; use 一半 or a percentage.
+这种手机的价格下降了两倍。|这种手机的价格下降了三分之二。|Wrong number: 倍 cannot describe a fall in price.
+参加这次会议的有校长、老师和学生代表等三百多人左右。|参加这次会议的有校长、老师和学生代表等三百多人。|Repetition: 多 and 左右 both mark an approximate number.
+我们学校有大约一千名左右的学生。|我们学校有大约一千名学生。|Repetition: 大约 and 左右 are both “about”.
+他的发言赢得了全场热烈的掌声和欢呼声音。|他的发言赢得了全场热烈的掌声和欢呼声。|Repetition: 声 already means sound; 声音 is redundant after 欢呼.
+这部电影深刻地反映了普通人的生活，十分感人肺腑。|这部电影深刻地反映了普通人的生活，感人肺腑。|Wrong degree word: 感人肺腑 is already strong and does not take 十分.
+同学们怀着非常激动的心情，参观了这座博物馆。|同学们怀着激动的心情，参观了这座博物馆。|(correct, though 非常 is acceptable)
+他对自己的错误有了深刻的认识和检查。|他对自己的错误有了深刻的认识，并作了检查。|Wrong collocation: 有了…检查 does not work; 检查 needs its own verb.
+博物馆展出了两千年前新出土的文物。|博物馆展出了新出土的两千年前的文物。|Wrong order: 新出土 (newly dug up) describes the find, two thousand years describes the objects.
+一位优秀的有二十年教龄的语文老师给我们上课。|一位有二十年教龄的优秀语文老师给我们上课。|Wrong order of modifiers: the factual modifier goes before the evaluative one.
+政府对这个问题非常重视，采取了很多措施和方法解决。|政府对这个问题非常重视，采取了很多措施来解决。|Repetition: 措施 and 方法 overlap, and 解决 needs 来 to link it.
+这篇文章的内容和语言都写得非常生动。|这篇文章的语言写得非常生动，内容也很丰富。|Mismatch: 内容 cannot be 生动 in the same way as language; give each its own predicate.
+大家对他的提议都表示一致同意。|大家对他的提议都表示同意。|Repetition: 都 and 一致 both mean everyone agreed.
+他的病好了，又重新回到了工作岗位。|他的病好了，又回到了工作岗位。|Repetition: 又 and 重新 both mean “again”.
+为了提高学生的口语水平，学校采取了一系列的措施。|为了提高学生的口语水平，学校采取了一系列措施。|(correct)
+他读书的时候常常会忘记了吃饭。|他读书的时候常常会忘记吃饭。|Wrong aspect: 常常 describes a habit and does not take 了.
+昨天他每天都去图书馆。|那段时间他每天都去图书馆。|Mismatch: 昨天 is one day, so it cannot go with 每天.
+我明天已经去过上海了。|我昨天已经去过上海了。|Tense mismatch: 明天 (tomorrow) cannot go with 已经…过 (already done).
+妈妈把一杯水递给了我手里。|妈妈把一杯水递到了我手里。|Wrong preposition: 递到…手里 (into my hand), or 递给我.
+他们正在热烈地讨论着关于明年的计划。|他们正在热烈地讨论明年的计划。|Wrong use of 关于: 讨论 takes its object directly.
+关于这个问题，引起了大家的热烈讨论。|这个问题引起了大家的热烈讨论。|No subject: a 关于 phrase cannot be the subject of 引起.
+对于这件事，我们必须引起高度重视。|对于这件事，我们必须高度重视。|Wrong verb: 引起重视 means “attract attention”, which is not what we do to a matter.
+他把门关得很紧，免得冷风吹不进来。|他把门关得很紧，免得冷风吹进来。|Double negative: 免得 already means “so that … not”.
+我们要努力学习，将来成为一个对社会有用。|我们要努力学习，将来成为一个对社会有用的人。|Missing noun: 成为 needs an object such as 的人.
+在这次比赛中，我们班获得了第一名的好成绩的荣誉。|在这次比赛中，我们班获得了第一名的好成绩。|Redundant: 好成绩 and 荣誉 cannot both be the object of 获得 here.
+这本小说的作者是一个十八岁的年轻人写的。|这本小说的作者是一个十八岁的年轻人。|Mixed structures: 作者是… and …写的 overlap.
+他的作文被选为全校的优秀作文之一，得到了老师的表扬。|他的作文被选为全校的优秀作文之一，得到了老师的表扬。|(correct)
+春天的北京，是一年中最美的季节。|春天，是北京一年中最美的季节。|Mismatch: 春天的北京 is a city, not a season.
+这次旅行让我增长了见识，开阔了眼界，丰富了知识。|这次旅行让我增长了见识，开阔了眼界。|(acceptable, but 增长见识 and 丰富知识 overlap)
+他的学习成绩在班里一直名列前茅，经常考第一。|他的学习成绩在班里一直名列前茅。|(acceptable, but slightly redundant)
+看了这部电影，对我的教育很大。|这部电影对我的教育很大。|No subject: 看了这部电影 cannot be the subject of 对我的教育很大.
+听了老师的话，心里觉得很温暖。|听了老师的话，我心里觉得很温暖。|Missing subject: who feels warm? Add 我.
+学习汉语的人越来越多，特别是年轻人更多。|学习汉语的人越来越多，特别是年轻人。|Redundant: 特别是… already implies more; 更多 repeats it.
+这家饭馆的菜不但好吃，而且价格也很公道。|这家饭馆的菜不但好吃，而且价格也很公道。|(correct)
+在大家的帮助下，他很快就适应了新的环境。|在大家的帮助下，他很快就适应了新的环境。|(correct)
+据统计，今年来这里旅游的游客比去年增加了百分之二十。|据统计，今年来这里旅游的游客比去年增加了百分之二十。|(correct)
+专家指出，长时间使用手机会对眼睛造成伤害。|专家指出，长时间使用手机会对眼睛造成伤害。|(correct)
+经过反复试验，科学家们终于找到了解决问题的方法。|经过反复试验，科学家们终于找到了解决问题的方法。|(correct)
+他平时很少说话，可是一到讨论问题的时候就特别积极。|他平时很少说话，可是一到讨论问题的时候就特别积极。|(correct)
+这座古老的建筑已经有八百多年的历史了。|这座古老的建筑已经有八百多年的历史了。|(correct)
+保护环境不只是政府的责任，也是每个人的责任。|保护环境不只是政府的责任，也是每个人的责任。|(correct)
+我们的教室打扫得非常干净整洁。|我们的教室打扫得非常干净整洁。|(correct)
+秋天到了，公园里的树叶渐渐变黄了。|秋天到了，公园里的树叶渐渐变黄了。|(correct)
+这个问题虽然不大，但是如果处理不好，也会带来严重的后果。|这个问题虽然不大，但是如果处理不好，也会带来严重的后果。|(correct)
+通过学习，我们掌握了很多新的方法。|通过学习，我们掌握了很多新的方法。|(correct)
+我们不仅要学好专业知识，还要培养自己的动手能力。|我们不仅要学好专业知识，还要培养自己的动手能力。|(correct)
+这部电影受到了观众的广泛好评。|这部电影受到了观众的广泛好评。|(correct)
+每个人都应该养成节约用水的好习惯。|每个人都应该养成节约用水的好习惯。|(correct)
+他的建议得到了大家的一致赞同。|他的建议得到了大家的一致赞同。|(correct)
+在这次比赛中，他发挥出了自己的最好水平。|在这次比赛中，他发挥出了自己的最好水平。|(correct)
+读书可以开阔我们的眼界，丰富我们的知识。|读书可以开阔我们的眼界，丰富我们的知识。|(correct)
+近年来，越来越多的外国人开始学习汉语。|近年来，越来越多的外国人开始学习汉语。|(correct)
+他做事一向认真负责，从来没有出过差错。|他做事一向认真负责，从来没有出过差错。|(correct)
+我们应该从小培养孩子独立思考的能力。|我们应该从小培养孩子独立思考的能力。|(correct)
+这家公司的产品在国际市场上很有竞争力。|这家公司的产品在国际市场上很有竞争力。|(correct)
+通过老师的耐心讲解，使我终于明白了这道题的做法。|通过老师的耐心讲解，我终于明白了这道题的做法。|No subject: 通过… plus 使 leaves the sentence without a subject.
+由于天气的原因，使航班推迟了两个小时。|由于天气的原因，航班推迟了两个小时。|No subject: 由于… plus 使 removes the subject. Drop 使.
+当我走进教室的时候，使我感到非常紧张。|当我走进教室的时候，我感到非常紧张。|No subject: a 当…的时候 clause cannot be the subject of 使.
+这件衣服大概要三百块钱左右。|这件衣服大概要三百块钱。|Repetition: 大概 and 左右 both mean “about”.
+从这里到机场估计需要差不多一个小时左右。|从这里到机场估计需要一个小时左右。|Repetition: 差不多 and 左右 both mean “about”.
+他把自己的全部所有的钱都捐给了学校。|他把自己所有的钱都捐给了学校。|Repetition: 全部 and 所有 both mean “all”.
+这是我第一次初次来中国。|这是我第一次来中国。|Repetition: 第一次 and 初次 both mean “the first time”.
+他每天早上都去公园晨练，从不间断，天天如此。|他每天早上都去公园晨练，从不间断。|Repetition: 每天 and 天天如此 say the same thing.
+这个问题已经引起了有关部门的重视程度。|这个问题已经引起了有关部门的重视。|Wrong object: 引起 takes 重视, not 重视程度.
+为了防止这类错误不再出现，老师又讲了一遍。|为了防止这类错误再出现，老师又讲了一遍。|Double negative: 防止…不再 reverses the meaning.
+我们必须避免不犯同样的错误。|我们必须避免犯同样的错误。|Double negative: 避免不犯 means the opposite.
+他能否考上大学，主要靠他自己的努力。|他能否考上大学，主要看他自己是否努力。|Two sides vs one: 能否 needs a matching 是否.
+是否具有良好的习惯，是学好外语的重要条件。|具有良好的习惯，是学好外语的重要条件。|Two sides vs one: 是否 cannot be matched with a one-sided 重要条件.
+我们要提高环境保护的意识，增强节约资源的水平。|我们要提高环境保护的意识，增强节约资源的意识。|Wrong collocation: 增强 goes with 意识, not 水平.
+近几年，这个城市的面貌发生了很大的改善。|近几年，这个城市的面貌发生了很大的变化。|Wrong collocation: 发生变化; 改善 is not something that 发生.
+通过调查，我们了解到市民对公共交通的需求很满意。|通过调查，我们了解到市民对公共交通很满意。|Mismatch: people can be 满意 with transport, but a 需求 cannot be 满意.
+他提出的建议被大家采取了。|他提出的建议被大家采纳了。|Wrong collocation: 采纳建议 (accept a suggestion); 采取 goes with 措施.
+我们要采纳有效的措施保护野生动物。|我们要采取有效的措施保护野生动物。|Wrong collocation: 采取措施 (take measures).
+老师耐心地交流了这个问题的解决方法。|老师耐心地讲解了这个问题的解决方法。|Wrong verb: 交流 needs a partner; a teacher 讲解 a method.
+他对工作的热情和积极性都很高涨。|他对工作的热情很高，积极性也很强。|Mismatch: 高涨 suits 热情 but not 积极性 here; split the predicates.
+上海是中国最大的城市之一的地方。|上海是中国最大的城市之一。|Redundant ending: 之一 already ends the phrase.
+我们班的同学都基本上完成了作业。|我们班的同学基本上都完成了作业。|Wrong order: 基本上 goes before 都.
+我认真地仔细检查了一遍作业。|我认真地检查了一遍作业。|Repetition: 认真地 and 仔细 overlap.
+这个暑假我读了很多好书和杂志等等。|这个暑假我读了很多好书和杂志。|Redundant: 等等 adds nothing after a two-item list.
+他的病情已经基本上完全恢复了。|他的病情已经基本恢复了。|Contradiction: 基本上 (mostly) and 完全 (completely) clash.
+我们一定要把这件事完成好的目标。|我们一定要把这件事完成好。|Redundant object: 完成好 already completes the 把 sentence.
+同学们兴高采烈地走进教室，心情十分高兴。|同学们兴高采烈地走进教室。|Repetition: 兴高采烈 already means very happy.
+这次考试他得了九十分，比上次提高了很多分数。|这次考试他得了九十分，比上次提高了很多。|Redundant: 分数 repeats 分 and is unnatural after 很多.
+他是一位深受学生们爱戴的好老师之一。|他是一位深受学生们爱戴的好老师。|Mismatch: 一位 (one person) contradicts 之一 (one of many).
+我们要努力克服并发现自己的不足。|我们要努力发现并克服自己的不足。|Wrong order: a weakness must be found before it can be overcome.
+他的成功，取决于他平时刻苦的努力和认真。|他的成功，取决于他平时的刻苦努力。|Mismatch: 认真 cannot be a noun object alongside 努力 here.
+今年夏天的天气格外炎热得很。|今年夏天的天气格外炎热。|Repetition: 格外 and 得很 both intensify.
+我买了一件新衣服，可是穿上以后觉得很不合身，所以很满意。|我买了一件新衣服，可是穿上以后觉得很不合身，所以不太满意。|Illogical connective: 不合身 cannot lead to 很满意.
+经理把这个任务交给我以后，就出差去了外地了。|经理把这个任务交给我以后，就出差去了外地。|Repetition: two 了 for one action.
+大家纷纷争先恐后地报名参加比赛。|大家争先恐后地报名参加比赛。|Repetition: 纷纷 and 争先恐后 overlap.
