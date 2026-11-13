@@ -396,5 +396,8 @@ if(window.HSK_ADV){const A=window.HSK_ADV;
   A.listen.forEach(r=>addA('Advanced','retell',r.t,'Listen, then retell the passage in your own words.'));
 }
 
+/* picture questions (pics.js) */
+if(window.HSK_PICS)window.HSK_PICS.listen.forEach(x=>listening.push(x));
+
 window.HSK_BANKS={listening,speaking:sp,buildPron};
 })();

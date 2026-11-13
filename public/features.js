@@ -189,6 +189,7 @@ function lsTypes(){const el=$('#lsType');const types=[...new Set(LISTEN.filter(x
   if(types.length<2){LS.type='';fresh.hidden=true;return}fresh.hidden=false;if(!types.includes(LS.type))LS.type='';
   const n=t=>LISTEN.filter(x=>x.lvl===LS.lvl&&(!t||x.type===t)).length;const list=['',...types];
   seg(fresh,list.map(t=>`${t||'All parts'} <span class="note">${n(t)}</span>`),i=>{LS.type=list[i];lsRender();$('#lsPlay').textContent='▶ Play audio'},list.indexOf(LS.type))}
+function lsPic(files,cls){return `<span class="pic ${cls||''}">${files.map(f=>`<img src="img/e/${f}" alt="" loading="lazy">`).join('')}</span>`}
 function lsRender(){
   stopAudio();const dk=lsDeck(),it=dk.cur();LS.plays=0;LS.showT=false;$('#lsPos').textContent=dk.label();
   const wrongMark=id=>H.data.listen.wrong[id]?' <span class="chip warn-chip">in your mistake book</span>':'';
@@ -199,7 +200,8 @@ function lsRender(){
   $('#lsTBtn').textContent='Show transcript';
   $('#lsQs').innerHTML=it.qs.map((q,qi)=>`<div class="lq" data-qi="${qi}">
       <p class="lq-q"><span class="han">${it.qs.length>1?(qi+1)+'. ':''}${esc(q.q)}</span> ${q.qEn?` <span class="note">${esc(q.qEn)}</span>`:''}</p>
-      <div class="lopts">${q.opts.map((o,oi)=>`<button class="choice lopt" type="button" data-oi="${oi}"><span class="letter">${'ABCD'[oi]}</span><span class="han">${esc(o)}</span></button>`).join('')}</div>
+      ${q.pic?lsPic(q.pic,'big'):''}
+      <div class="lopts${q.optPics?' pic-opts':''}">${q.opts.map((o,oi)=>`<button class="choice lopt" type="button" data-oi="${oi}"><span class="letter">${'ABCDEF'[oi]}</span>${q.optPics?lsPic(q.optPics[oi]):`<span class="han">${esc(o)}</span>`}</button>`).join('')}</div>
       <p class="lwhy" hidden></p></div>`).join('');
   const done=LS.answers[it.id];if(done)done.forEach((oi,qi)=>{if(oi!=null)lsMark(it,qi,oi,false)});
 }
@@ -207,7 +209,7 @@ function lsMark(it,qi,oi,record){
   const q=it.qs[qi],box=$(`#lsQs .lq[data-qi="${qi}"]`);const ok=oi===q.ans;
   box.querySelectorAll('.lopt').forEach((b,i)=>{b.disabled=true;if(i===q.ans)b.classList.add('right');else if(i===oi)b.classList.add('wrong');
     if(q.en&&q.en[i])b.insertAdjacentHTML('beforeend',`<span class="note opt-en">${esc(q.en[i])}</span>`)});
-  const why=box.querySelector('.lwhy');why.hidden=false;why.innerHTML=`<span class="verdict ${ok?'good':'bad'}">${ok?'Correct':'Answer: '+'ABCD'[q.ans]}</span> ${esc(q.why)}`;
+  const why=box.querySelector('.lwhy');why.hidden=false;why.innerHTML=`<span class="verdict ${ok?'good':'bad'}">${ok?'Correct':'Answer: '+'ABCDEF'[q.ans]}</span> ${esc(q.why)}`;
   if(record){(LS.answers[it.id]||(LS.answers[it.id]=[]))[qi]=oi;
     const all=it.qs.every((_,k)=>LS.answers[it.id][k]!=null);
     if(all){const allOk=it.qs.every((qq,k)=>LS.answers[it.id][k]===qq.ans);H.recordListening(it.id,it.lvl,allOk)}

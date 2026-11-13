@@ -227,6 +227,11 @@ select.search{appearance:auto}
 .rw-part .han{font-size:1.1rem;line-height:1.7;font-weight:400}
 .rw-part.used,.chip-btn.used{opacity:.4}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
+.pic{display:inline-flex;gap:6px;align-items:center;justify-content:center}.pic img{width:56px;height:56px}
+.pic.big{display:flex;margin:6px auto 10px}.pic.big img{width:110px;height:110px}
+.pic.scene{display:flex;margin:6px auto 4px;padding:18px;gap:14px;background:var(--bg);border-radius:16px;width:max-content;max-width:100%}.pic.scene img{width:84px;height:84px}
+.pic-opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}.pic-opts .lopt{flex-direction:column;align-items:center;padding:10px}
+.center{text-align:center}.note.center{margin-inline:auto}
 .rw-list{margin:0;padding-left:1.6em;display:grid;gap:4px;font-size:1.05rem}
 .letters-only{display:flex;flex-wrap:wrap;gap:8px}.letters-only .lopt{min-width:52px;justify-content:center}
 .rw-title{font-weight:600;text-align:center}
@@ -326,7 +331,7 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
   <section id="listening">
     <div class="eyebrow">Listening · the largest part of the HSK</div>
     <h2>Listening practice</h2>
-    <p class="lede">A bank of more than 1,000 questions across HSK 1–6: short dialogues, conversations, passages, true-or-false items, and the HSK 6 tasks “choose the true statement” and interviews. Play the audio, answer, then read the transcript and the explanation. Shuffle to drill in a new order.</p>
+    <p class="lede">A bank of more than 1,000 questions across HSK 1–6: short dialogues, conversations, passages, true-or-false items, picture questions for HSK 1–3, and the HSK 6 tasks “choose the true statement” and interviews. Play the audio, answer, then read the transcript and the explanation. Shuffle to drill in a new order.</p>
     <div class="seg" id="lsSeg" role="group" aria-label="Listening level"></div>
     <div class="seg seg-sub" id="lsType" role="group" aria-label="Question type"></div>
     <div class="panel lpanel">
@@ -341,7 +346,7 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
   <section id="reading">
     <div class="eyebrow">Reading</div>
     <h2>Reading practice</h2>
-    <p class="lede">Thousands of items in the formats of the HSK reading paper: recognise words, match questions and replies, fill the gap, judge true or false, put sentences in order, answer questions on short texts, and the HSK 5–6 tasks: passage gaps, which statement is true, putting clauses back into a text, and finding the faulty sentence.</p>
+    <p class="lede">Thousands of items in the formats of the HSK reading paper: match words and sentences to pictures, recognise words, match questions and replies, fill the gap, judge true or false, put sentences in order, answer questions on short texts, and the HSK 5–6 tasks: passage gaps, which statement is true, putting clauses back into a text, and finding the faulty sentence.</p>
     <div class="seg" id="rdLvl" role="group" aria-label="Reading practice level"></div>
     <div class="seg" id="rdMode" role="group" aria-label="Reading practice task"></div>
     <div class="panel quiz rw-card">
@@ -355,7 +360,7 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
   <section id="writing">
     <div class="eyebrow">Writing</div>
     <h2>Writing practice</h2>
-    <p class="lede">The HSK writing tasks from level 3 up: build a sentence from pieces, type characters from pinyin, write a sentence with a given word, write a short text with five given words, and summarise a story (HSK 6). Sentences are checked automatically; free writing shows a model to compare with.</p>
+    <p class="lede">The HSK writing tasks from level 3 up: build a sentence from pieces, type characters from pinyin, write a sentence with a given word or about a picture, write a short text with five given words or about a picture, and summarise a story (HSK 6). Sentences are checked automatically; free writing shows a model to compare with.</p>
     <div class="seg" id="wrLvl" role="group" aria-label="Writing practice level"></div>
     <div class="seg" id="wrMode" role="group" aria-label="Writing practice task"></div>
     <div class="panel quiz rw-card">
@@ -436,7 +441,7 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem}
   </section>
 </main>
 
-<footer class="wrap">Model audio is a natural neural voice recorded for every word and sentence; if a clip is missing, your device's built-in voice is used instead. Tone checks run entirely on your device: your recording is analysed in the browser and never uploaded. Where your browser offers speech recognition, it also checks which characters were understood. Word list: HSK 3.0 syllabus via the open-source complete-hsk-vocabulary project (MIT), definitions from CC-CEDICT. Exam formats vary by test centre; confirm on chinesetest.cn. Practice sentences are original.</footer>
+<footer class="wrap">Model audio is a natural neural voice recorded for every word and sentence; if a clip is missing, your device's built-in voice is used instead. Tone checks run entirely on your device: your recording is analysed in the browser and never uploaded. Where your browser offers speech recognition, it also checks which characters were understood. Word list: HSK 3.0 syllabus via the open-source complete-hsk-vocabulary project (MIT), definitions from CC-CEDICT. Pictures: Twemoji by Twitter, Inc. and other contributors, licensed CC-BY 4.0. Exam formats vary by test centre; confirm on chinesetest.cn. Practice sentences are original.</footer>
 
 <div class="jump" id="jump">
   <button type="button" id="jumpTop" aria-label="Back to top" hidden>↑</button>
@@ -740,6 +745,7 @@ $('#rules').addEventListener('click',e=>{const b=e.target.closest('[data-say]');
 </script>
 <script src="tone.js"></script>
 <script src="adv.js"></script>
+<script src="pics.js"></script>
 <script src="banks.js"></script>
 <script src="features.js"></script>
 <script src="rw.js"></script>

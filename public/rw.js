@@ -7,7 +7,8 @@ const grpOfLevel=l=>l<=2?0:l<=4?1:2;
 const GROUP_OF_HSKK={Beginner:0,Intermediate:1,Advanced:2};
 const PUNCT=/[，。！？、：；“”‘’（）《》…—\s,.!?]/;
 
-function buildRW(VOCAB,LISTEN,SPEAKING,ADV){
+function buildRW(VOCAB,LISTEN,SPEAKING,ADV,PICS){
+  LISTEN=LISTEN.filter(it=>!it.qs.some(q=>q.pic||q.optPics)); // picture items need their pictures; they stay in listening
   const R=rng(20261106);const ri=n=>Math.floor(R()*n);const pk=a=>a[ri(a.length)];
   const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=ri(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
   const isProper=py=>/^[A-ZĀÁǍÀĒÉĚÈŌÓǑÒ]/.test(py);
@@ -42,7 +43,7 @@ function buildRW(VOCAB,LISTEN,SPEAKING,ADV){
   LISTEN.forEach(it=>it.lines.forEach(([w,t])=>splitS(t).forEach(s=>addS(s,grpOfLevel(it.lvl),'listen'))));
 
   /* ---------- READING ---------- */
-  const reading=[[],[],[]].map(()=>({words:[],qa:[],cloze:[],judge:[],order:[],comp:[],gist:[],pcloze:[],insert:[],bingju:[]}));
+  const reading=[[],[],[]].map(()=>({words:[],qa:[],cloze:[],judge:[],order:[],comp:[],gist:[],pcloze:[],insert:[],bingju:[],picjudge:[],picmatch:[]}));
   // word recognition: pinyin + meaning -> characters
   for(const w of DICT.values()){if(isProper(w.py)||w.lvl>4)continue;const g=grpOfLevel(w.lvl);const len=[...w.h].length;
     const pool=(byLevelLen[w.lvl+'|'+len]||[]).filter(x=>x.h!==w.h&&![...x.h].some(c=>w.h.includes(c)));if(pool.length<3)continue;
@@ -76,7 +77,7 @@ function buildRW(VOCAB,LISTEN,SPEAKING,ADV){
     if(p.g<2)reading[1].order.push(item);else{reading[2].order.push(item);if(L<=80)reading[1].order.push(item)}}});
 
   /* ---------- WRITING ---------- */
-  const writing=[[],[],[]].map(()=>({build:[],pinyin:[],word:[],essay:[],suoxie:[]}));
+  const writing=[[],[],[]].map(()=>({build:[],pinyin:[],word:[],essay:[],suoxie:[],picsent:[],picessay:[]}));
   const LIMIT=[[5,14],[7,20],[12,26]];
   const SMALL=new Set(['的','了','吗','呢','吧','着','过','得','地','们','啊']);
   const buildSrc=[...corpus,...corpus.filter(c=>c.g<2&&[...c.t].length>=13).map(c=>({...c,g:2}))];
@@ -104,6 +105,9 @@ function buildRW(VOCAB,LISTEN,SPEAKING,ADV){
     ADV.bingju.forEach(b=>reading[2].bingju.push({kind:'bingju',opts:b.opts,ans:b.ans,why:b.why,good:b.good}));
     ADV.suoxie.forEach(x=>writing[2].suoxie.push({kind:'suoxie',...x}));
   }
+  /* ---------- picture tasks ---------- */
+  if(PICS){reading[0].picjudge=PICS.picjudge.slice();reading[0].picmatch=PICS.picmatch.slice();
+    writing[1].picsent=PICS.picsent.map(x=>({kind:'picsent',pic:x.pic,word:x.w,py:x.py,model:x.model}));writing[2].picessay=PICS.picessay.slice()}
   return {reading,writing,GROUPS,seg};
 }
 
@@ -113,20 +117,20 @@ if(typeof module!=='undefined'){module.exports={buildRW};return}
 const $=s=>document.querySelector(s);
 const esc=s=>escapeHtml(String(s));
 let RW=null;const decks={};
-const RMODES=[[['words','Word recognition'],['qa','Question & answer'],['cloze','Fill the blank'],['comp','Read & answer']],
+const RMODES=[[['picjudge','Picture: true or false'],['picmatch','Match a picture'],['words','Word recognition'],['qa','Question & answer'],['cloze','Fill the blank'],['comp','Read & answer']],
   [['cloze','Fill the blank'],['qa','Question & answer'],['judge','True or false'],['order','Sentence order'],['comp','Read & answer']],
   [['cloze','Fill the blank'],['pcloze','Passage gaps (HSK 5)'],['gist','Which is true? (HSK 5)'],['insert','Put clauses back (HSK 6)'],['bingju','Faulty sentence (HSK 6)'],['order','Sentence order'],['comp','Read & answer']]];
 const WMODES=[[['build','Build the sentence'],['pinyin','Pinyin to characters']],
-  [['build','Build the sentence'],['pinyin','Pinyin to characters'],['word','Write with a word']],
-  [['build','Build the sentence'],['essay','Short essay (HSK 5)'],['suoxie','Summarise a story (HSK 6)']]];
+  [['build','Build the sentence'],['pinyin','Pinyin to characters'],['word','Write with a word'],['picsent','Picture + word (HSK 4)']],
+  [['build','Build the sentence'],['essay','Short essay (HSK 5)'],['suoxie','Summarise a story (HSK 6)'],['picessay','Picture essay (HSK 5)']]];
 const ST={rd:{g:0,m:'words'},wr:{g:0,m:'build'}};
 function ensure(){if(RW)return RW;if(typeof VOCAB==='undefined'||!VOCAB||!window.HSK_FEATURES||!window.HSK_BANKS)return null;
-  RW=buildRW(VOCAB,HSK_FEATURES.LISTEN,HSK_BANKS.speaking,window.HSK_ADV);return RW}
+  RW=buildRW(VOCAB,HSK_FEATURES.LISTEN,HSK_BANKS.speaking,window.HSK_ADV,window.HSK_PICS);return RW}
 function deck(sec){const s=ST[sec];const k=`${sec}-${s.g}-${s.m}`;if(decks[k])return decks[k];const src=(sec==='rd'?RW.reading:RW.writing)[s.g][s.m]||[];return decks[k]=HSK_FEATURES.Deck(k,src)}
 function record(sec,ok){if(window.HSKP&&HSKP.recordSkill)HSKP.recordSkill(sec==='rd'?'reading':'writing',ok)}
 function modeSeg(sec){const s=ST[sec];const list=(sec==='rd'?RMODES:WMODES)[s.g];const el=$(`#${sec}Mode`);const fresh=el.cloneNode(false);el.replaceWith(fresh);
   if(!list.find(m=>m[0]===s.m))s.m=list[0][0];seg(fresh,list.map(m=>m[1]),i=>{s.m=list[i][0];render(sec)},list.findIndex(m=>m[0]===s.m))}
-const LETTERS='ABCDE';
+const LETTERS='ABCDEF';
 function render(sec){
   const body=$(`#${sec}Body`),rev=$(`#${sec}Reveal`);rev.innerHTML='';
   if(!ensure()){body.innerHTML='<p class="note">Loading the word list…</p>';return}
@@ -134,7 +138,11 @@ function render(sec){
   const it=dk.cur();if(!it){body.innerHTML='<p class="note">No items here yet.</p>';return}
   const s=ST[sec];$(`#${sec}Head`).textContent=`${RW.GROUPS[s.g][0]} · ${(sec==='rd'?RMODES:WMODES)[s.g].find(m=>m[0]===s.m)[1]}`;
   body.dataset.answered='';
-  if(it.kind==='words')body.innerHTML=`<p class="rw-prompt"><span class="pyl">${colorPinyin(esc(it.w.py))}</span> <span class="note">${esc(it.w.en)}</span></p><p class="note">Choose the characters.</p>${opts(it.opts)}`;
+  if(it.kind==='picjudge')body.innerHTML=`${PIC(it.pic,'big')}<p class="rw-prompt center"><span class="han big-han">${esc(it.w)}</span> <span class="pyl">${colorPinyin(esc(it.py))}</span></p><p class="note">Does the word match the picture? (HSK 1 reading, part 1)</p>${opts(['对 ✓','错 ✗'])}`;
+  else if(it.kind==='picmatch')body.innerHTML=`<p class="rw-prompt han">${esc(it.text)}</p><p class="note">Choose the picture that matches the sentence (HSK 1–2 reading).</p>${picOpts(it.optPics)}`;
+  else if(it.kind==='picsent')body.innerHTML=`${PIC(it.pic,'big')}<p class="rw-prompt center"><span class="han big-han">${esc(it.word)}</span> <span class="pyl">${colorPinyin(esc(it.py))}</span></p><p class="note">Look at the picture and write one sentence that uses this word (HSK 4 writing, part 2).</p><textarea class="rw-area han" id="${sec}Input" rows="3" lang="zh" aria-label="Your sentence"></textarea><div class="toolbar"><button class="btn small" type="button" data-act="check">Check and show a model</button></div>`;
+  else if(it.kind==='picessay')body.innerHTML=`${PIC(it.pics,'scene')}<p class="note center">${esc(it.en)}</p><p class="note">Write a short text of about 80 characters about the picture (HSK 5 writing, part 2, about 15 minutes in the exam).</p><textarea class="rw-area han" id="${sec}Input" rows="6" lang="zh" aria-label="Your text"></textarea><div class="toolbar"><span class="note num" id="${sec}Count">0 characters</span><button class="btn small" type="button" data-act="check">Check and show a model</button></div>`;
+  else if(it.kind==='words')body.innerHTML=`<p class="rw-prompt"><span class="pyl">${colorPinyin(esc(it.w.py))}</span> <span class="note">${esc(it.w.en)}</span></p><p class="note">Choose the characters.</p>${opts(it.opts)}`;
   else if(it.kind==='qa')body.innerHTML=`<p class="rw-prompt han">${esc(it.q)}</p><p class="note">Choose the best reply.</p>${opts(it.opts)}`;
   else if(it.kind==='cloze')body.innerHTML=`<p class="rw-prompt han">${esc(it.text)}</p><p class="note">Choose the word that fits the gap.</p>${opts(it.opts)}`;
   else if(it.kind==='judge'){const q=it.it.qs[0];body.innerHTML=`<p class="rw-prompt han">${esc(it.it.lines[0][1])}</p><p class="rw-prompt han">${esc(q.q)}</p><p class="note">Is the starred statement true?</p>${opts(['对 true','错 false'])}`}
@@ -157,6 +165,7 @@ function render(sec){
   else if(it.kind==='word')body.innerHTML=`<p class="rw-prompt"><span class="han big-han">${esc(it.word)}</span> <span class="pyl">${colorPinyin(esc(it.py))}</span> <span class="note">${esc(it.en)}</span></p><p class="note">Write one complete sentence that uses this word (HSK 4 writing, part 2).</p><textarea class="rw-area han" id="${sec}Input" rows="3" lang="zh" aria-label="Your sentence"></textarea><div class="toolbar"><button class="btn small" type="button" data-act="check">Check and show a model</button></div>`;
   else if(it.kind==='essay')body.innerHTML=`<p class="note">Write about 80 characters using all five words (HSK 5 writing). The count and word checks update as you type.</p><div class="chips">${it.words.map(w=>`<span class="chip word-need" data-w="${esc(w.h)}"><span class="han">${esc(w.h)}</span> <span class="note">${esc(w.py)}</span></span>`).join('')}</div><textarea class="rw-area han" id="${sec}Input" rows="6" lang="zh" aria-label="Your short essay"></textarea><div class="toolbar"><span class="note num" id="${sec}Count">0 characters</span><button class="btn small" type="button" data-act="check">Finish and show a model</button></div>`;
   body._seq=[];body._got=[];clearInterval(body._clock);
+  if(it.kind==='picessay'){const ta=$(`#${sec}Input`);ta.addEventListener('input',()=>{$(`#${sec}Count`).textContent=`${cnt(ta.value)} characters (aim 80)`})}
   if(it.kind==='suoxie'){const t0=Date.now();body._clock=setInterval(()=>{const el=$(`#${sec}Clock`);if(!el){clearInterval(body._clock);return}const s2=Math.floor((Date.now()-t0)/1000);el.textContent=`${Math.floor(s2/60)}:${String(s2%60).padStart(2,'0')}`},1000);
     const ta=$(`#${sec}Input`);ta.addEventListener('input',()=>{$(`#${sec}Count`).textContent=`${cnt(ta.value)} characters (aim ${aim(it)})`})}
   if(it.kind==='essay'){const ta=$(`#${sec}Input`);ta.addEventListener('input',()=>{const t=ta.value;const n=[...t.replace(/[\s，。！？、：；“”‘’,.!?]/g,'')].length;$(`#${sec}Count`).textContent=`${n} characters`;body.querySelectorAll('.word-need').forEach(c=>c.classList.toggle('ok',t.includes(c.dataset.w)))})}
@@ -164,6 +173,8 @@ function render(sec){
 const cnt=t=>[...t.replace(/[\s，。！？、：；“”‘’,.!?]/g,'')].length;
 const aim=it=>it.aim||Math.round(it.len*0.4/10)*10;
 function letters(n,qi){return `<div class="lopts rw-opts letters-only" data-qi="${qi}">${[...Array(n)].map((_,i)=>`<button class="choice lopt" type="button" data-oi="${i}"><span class="letter">${LETTERS[i]}</span></button>`).join('')}</div>`}
+function PIC(files,cls){return `<span class="pic ${cls||''}">${files.map(f=>`<img src="img/e/${f}" alt="" loading="lazy">`).join('')}</span>`}
+function picOpts(list){return `<div class="lopts rw-opts pic-opts">${list.map((f,i)=>`<button class="choice lopt" type="button" data-oi="${i}"><span class="letter">${LETTERS[i]}</span>${PIC(f)}</button>`).join('')}</div>`}
 function opts(list,qi){return `<div class="lopts rw-opts"${qi!=null?` data-qi="${qi}"`:''}>${list.map((o,i)=>`<button class="choice lopt" type="button" data-oi="${i}"><span class="letter">${LETTERS[i]}</span><span class="han">${esc(o)}</span></button>`).join('')}</div>`}
 function listenBtn(text){return ` <button class="btn ghost small" type="button" data-say="${esc(text)}">▶ Listen</button>`}
 function mark(box,ans,oi,en){box.querySelectorAll('.lopt').forEach((b,i)=>{b.disabled=true;if(i===ans)b.classList.add('right');else if(i===oi)b.classList.add('wrong');if(en)b.insertAdjacentHTML('beforeend',`<span class="note opt-en">${esc(en[i])}</span>`)})}
@@ -181,7 +192,9 @@ function onClick(sec,e){
     if(body.dataset.answered)return;body.dataset.answered='1';
     if(it.kind==='judge'){const q=it.it.qs[0];const ok=oi===q.ans;mark(body,q.ans,oi);rev.innerHTML=`<span class="verdict ${ok?'good':'bad'}">${ok?'Correct':'Not quite'}</span> ${esc(q.why)}${listenBtn(it.it.lines[0][1])}`;record(sec,ok);return}
     const ok=oi===it.ans;mark(body,it.ans,oi,it.en);record(sec,ok);
-    if(it.kind==='words')rev.innerHTML=`<span class="verdict ${ok?'good':'bad'}">${ok?'Correct':'Not quite'}</span> <span class="han big-han">${esc(it.w.h)}</span>${listenBtn(it.w.h)}`;
+    if(it.kind==='picjudge')rev.innerHTML=`<span class="verdict ${ok?'good':'bad'}">${ok?'Correct':'Not quite'}</span> ${esc(it.why)}${listenBtn(it.w)}`;
+    else if(it.kind==='picmatch')rev.innerHTML=`<span class="verdict ${ok?'good':'bad'}">${ok?'Correct':'Answer: '+LETTERS[it.ans]}</span> <span class="han">${esc(it.text)}</span>${listenBtn(it.text)}`;
+    else if(it.kind==='words')rev.innerHTML=`<span class="verdict ${ok?'good':'bad'}">${ok?'Correct':'Not quite'}</span> <span class="han big-han">${esc(it.w.h)}</span>${listenBtn(it.w.h)}`;
     else if(it.kind==='gist')rev.innerHTML=`<span class="verdict ${ok?'good':'bad'}">${ok?'Correct':'Not quite'}</span> ${esc(it.why)}${listenBtn(it.full)}`;
     else if(it.kind==='bingju')rev.innerHTML=`<span class="verdict ${ok?'good':'bad'}">${ok?'Correct':'Answer: '+LETTERS[it.ans]}</span> ${esc(it.why)}<br><span class="note">Corrected:</span> <span class="han">${esc(it.good)}</span>`;
     else if(it.kind==='qa')rev.innerHTML=`<span class="verdict ${ok?'good':'bad'}">${ok?'Correct':'Not quite'}</span> ${esc(it.why)}${listenBtn(it.q+it.opts[it.ans])}`;
@@ -202,7 +215,9 @@ function onClick(sec,e){
   if(it.kind==='pinyin'){const inp=$(`#${sec}Input`);if(a==='show'){rev.innerHTML=`<span class="han big-han">${esc(it.word)}</span> <span class="note">${esc(it.en)}</span>${listenBtn(it.full)}`;return}
     const v=inp.value.trim();if(!v){rev.innerHTML='<span class="note">Type your answer first.</span>';return}const ok=v===it.word;record(sec,ok);
     rev.innerHTML=`<span class="verdict ${ok?'good':'bad'}">${ok?'Correct':'Not quite'}</span> <span class="han big-han">${esc(it.word)}</span> <span class="note">${esc(it.en)}</span>${listenBtn(it.full)}`;return}
-  if(it.kind==='word'){const v=$(`#${sec}Input`).value.trim();const n=[...v.replace(/[\s，。！？、：；,.!?]/g,'')].length;
+  if(it.kind==='picessay'){const v=$(`#${sec}Input`).value;const n=cnt(v);const ok=n>=60&&n<=110;
+    rev.innerHTML=`<div class="checks"><span class="chip ${ok?'':'warn-chip'}">${ok?'✓':'✗'} ${n} characters (aim for about 80)</span></div><p class="note">A model text about this picture. A good answer says who, where, what is happening, and adds a feeling or a point:</p><div class="rw-text han">${esc(it.model)}</div>${listenBtn(it.model)}<p class="note">Writing is not graded automatically: compare your ideas and grammar with the model.</p>`;return}
+  if(it.kind==='word'||it.kind==='picsent'){const v=$(`#${sec}Input`).value.trim();const n=[...v.replace(/[\s，。！？、：；,.!?]/g,'')].length;
     const checks=[[v.includes(it.word),`uses ${it.word}`],[n>=6,'at least 6 characters'],[/[。！？.!?]$/.test(v),'ends with punctuation']];
     rev.innerHTML=`<div class="checks">${checks.map(([ok,t])=>`<span class="chip ${ok?'':'warn-chip'}">${ok?'✓':'✗'} ${esc(t)}</span>`).join(' ')}</div><p class="note">Model sentence from the HSK texts on this site:</p><p class="han">${esc(it.model)}</p>${listenBtn(it.model)}<p class="note">Writing is not graded automatically: compare your grammar and word choice with the model.</p>`;return}
   if(it.kind==='suoxie'){if(a==='hide'){$(`#${sec}Story`).hidden=true;act.hidden=true;$(`#${sec}Write`).hidden=false;$(`#${sec}Input`).focus();return}
